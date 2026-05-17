@@ -1,0 +1,5 @@
+Continuar con el proyecto de migración de Firebase a Laravel del sistema "Gran Cañaveral". 
+Último trabajo: mostrar imágenes de productos en inventario y POS. 
+Verificar que las imágenes se carguen correctamente y probar el flujo completo de venta.
+Revisar si hay errores en el navegador y completar testing general del sistema.
+Las credenciales de prueba son: admin / admin123

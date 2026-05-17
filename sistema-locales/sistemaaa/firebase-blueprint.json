@@ -1,0 +1,123 @@
+{
+  "entities": {
+    "Event": {
+      "title": "Event",
+      "description": "Represents a booked event in the salon.",
+      "type": "object",
+      "properties": {
+        "clientName": { "type": "string" },
+        "clientId": { "type": "string" },
+        "eventType": { "type": "string" },
+        "date": { "type": "string", "format": "date" },
+        "guests": { "type": "number" },
+        "status": { "type": "string", "enum": ["Confirmado", "Pendiente", "Cancelado", "Cerrado"] },
+        "totalAmount": { "type": "number" },
+        "advancePayment": { "type": "number" },
+        "balancePending": { "type": "number" },
+        "paymentDueDate": { "type": "string", "format": "date" },
+        "signedContractUrl": { "type": "string" },
+        "sellerName": { "type": "string" }
+      },
+      "required": ["clientName", "clientId", "eventType", "date", "guests", "status", "totalAmount", "advancePayment", "balancePending", "paymentDueDate"]
+    },
+    "InventoryItem": {
+      "title": "InventoryItem",
+      "description": "Represents a product in stock (beverages, consumables, etc.)",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "category": { "type": "string", "enum": ["Mobiliario", "Catering", "Tecnología", "Decoración", "Bebidas", "Consumibles"] },
+        "boxes": { "type": "number" },
+        "unitsPerBox": { "type": "number" },
+        "looseUnits": { "type": "number" },
+        "pricePerBox": { "type": "number" },
+        "pricePerUnit": { "type": "number" },
+        "status": { "type": "string", "enum": ["In Stock", "Low Stock", "Maintenance"] }
+      },
+      "required": ["name", "category", "boxes", "unitsPerBox", "looseUnits", "pricePerBox", "pricePerUnit", "status"]
+    },
+    "Sale": {
+      "title": "Sale",
+      "description": "Represents a completed sale of inventory items during or for an event.",
+      "type": "object",
+      "properties": {
+        "eventId": { "type": "string" },
+        "clientName": { "type": "string" },
+        "items": { 
+          "type": "array"
+        },
+        "amount": { "type": "number" },
+        "cashReceived": { "type": "number" },
+        "changeGiven": { "type": "number" },
+        "date": { "type": "string", "format": "date-time" },
+        "paymentMethod": { "type": "string", "enum": ["Efectivo", "QR", "Tarjeta", "Transferencia"] },
+        "status": { "type": "string", "enum": ["Paid", "Partial", "Refunded"] },
+        "sellerName": { "type": "string" },
+        "isPrinted": { "type": "boolean" }
+      },
+      "required": ["eventId", "clientName", "items", "amount", "date", "paymentMethod", "status"]
+    },
+    "Staff": {
+      "title": "Staff",
+      "description": "Represents a staff member or system user.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "role": { "type": "string" },
+        "username": { "type": "string" },
+        "email": { "type": "string" },
+        "status": { "type": "string", "enum": ["Active", "On Leave"] },
+        "avatar": { "type": "string" }
+      },
+      "required": ["name", "role", "username", "email", "status"]
+    },
+    "Asset": {
+      "title": "Asset",
+      "description": "Fixed assets for kitchen and bar.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "category": { "type": "string", "enum": ["Cocina", "Cantina"] },
+        "quantity": { "type": "number" },
+        "condition": { "type": "string", "enum": ["Bueno", "Regular", "Malo"] },
+        "lastMaintenance": { "type": "string", "format": "date" }
+      },
+      "required": ["name", "category", "quantity", "condition"]
+    },
+    "AppSettings": {
+      "title": "AppSettings",
+      "description": "Global application configuration.",
+      "type": "object",
+      "properties": {
+        "qrImageUrl": { "type": "string" },
+        "eventTypes": { "type": "array" }
+      }
+    }
+  },
+  "firestore": {
+    "events": {
+      "schema": "Event",
+      "description": "Collection of events."
+    },
+    "inventory": {
+      "schema": "InventoryItem",
+      "description": "Collection of inventory items."
+    },
+    "sales": {
+      "schema": "Sale",
+      "description": "Collection of sales transactions."
+    },
+    "staff": {
+      "schema": "Staff",
+      "description": "Collection of staff profiles."
+    },
+    "assets": {
+      "schema": "Asset",
+      "description": "Collection of kitchen/bar assets."
+    },
+    "config": {
+      "schema": "AppSettings",
+      "description": "Global configuration documents."
+    }
+  }
+}
