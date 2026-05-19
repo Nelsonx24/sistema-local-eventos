@@ -11,12 +11,21 @@ use Illuminate\Support\Facades\Auth;
 
 class EventController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $events = Event::orderBy('date', 'asc')->get();
+        $query = Event::orderBy('date', 'asc');
+
+        $filter = $request->get('filter', 'upcoming');
+        if ($filter === 'past') {
+            $query->where('event_status', 'completed');
+        } elseif ($filter === 'upcoming') {
+            $query->where('event_status', 'upcoming');
+        }
+
+        $events = $query->paginate(10)->withQueryString();
         $eventTypes = Config::getEventTypes();
 
-        $eventsJson = $events->map(function ($e) {
+        $eventsJson = Event::orderBy('date', 'asc')->get()->map(function ($e) {
             return [
                 'id' => $e->id,
                 'title' => $e->client_name,
@@ -28,7 +37,7 @@ class EventController extends Controller
             ];
         });
 
-        return view('events.index', compact('events', 'eventTypes', 'eventsJson'));
+        return view('events.index', compact('events', 'eventTypes', 'eventsJson', 'filter'));
     }
 
     public function store(Request $request)

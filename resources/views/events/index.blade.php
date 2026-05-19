@@ -63,6 +63,13 @@
         </div>
     </div>
 
+    <!-- Filter Tabs -->
+    <div class="flex items-center gap-1 bg-slate-100 rounded-lg p-1 w-fit mb-4">
+        <a href="{{ route('events.index', ['filter' => 'upcoming']) }}" class="px-4 py-2 rounded-md text-xs font-bold transition-all {{ $filter === 'upcoming' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700' }}">Próximos</a>
+        <a href="{{ route('events.index', ['filter' => 'past']) }}" class="px-4 py-2 rounded-md text-xs font-bold transition-all {{ $filter === 'past' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700' }}">Finalizados</a>
+        <a href="{{ route('events.index', ['filter' => 'all']) }}" class="px-4 py-2 rounded-md text-xs font-bold transition-all {{ $filter === 'all' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700' }}">Todos</a>
+    </div>
+
     <!-- Calendar View -->
     <div id="calendar-view" class="hidden">
         <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
@@ -148,6 +155,12 @@
         </table>
     </div>
 </div>
+
+@if($events->hasPages())
+<div class="mt-4">
+    {{ $events->links() }}
+</div>
+@endif
 
 <!-- Create Event Modal -->
 <div id="event-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm hidden">

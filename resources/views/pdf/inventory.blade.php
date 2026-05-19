@@ -44,8 +44,8 @@
                 <td class="text-center">{{ $item->category }}</td>
                 <td class="text-center">{{ $item->boxes }}</td>
                 <td class="text-center">{{ $item->loose_units }}</td>
-                <td class="text-right">{{ number_format($item->price_per_box) }} Bs</td>
-                <td class="text-right">{{ number_format($item->price_per_unit) }} Bs</td>
+                <td class="text-right">{{ rtrim(rtrim(number_format($item->price_per_box, 2), '0'), '.') }} Bs</td>
+                <td class="text-right">{{ rtrim(rtrim(number_format($item->price_per_unit, 2), '0'), '.') }} Bs</td>
                 <td class="text-center">
                     @if($item->boxes <= 2)
                     <span class="stock-low">Stock Bajo</span>
@@ -61,14 +61,6 @@
             </tr>
             @endif
         </tbody>
-        <tfoot>
-            <tr style="background: #f1f5f9;">
-                <td colspan="2" class="text-right font-bold">TOTALES:</td>
-                <td class="text-center font-bold">{{ $inventory->sum('boxes') }}</td>
-                <td class="text-center font-bold">{{ $inventory->sum('loose_units') }}</td>
-                <td colspan="3"></td>
-            </tr>
-        </tfoot>
     </table>
 
     <div class="footer">

@@ -49,9 +49,19 @@ class InventoryController extends Controller
         $validated = $request->validate([
             'name' => 'string|max:255',
             'category' => 'string',
+            'units_per_box' => 'integer|min:1',
             'price_per_box' => 'numeric|min:0',
             'price_per_unit' => 'numeric|min:0',
+            'image_box' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            'image_unit' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
         ]);
+
+        if ($request->hasFile('image_box')) {
+            $validated['image_box'] = $request->file('image_box')->store('inventory', 'public');
+        }
+        if ($request->hasFile('image_unit')) {
+            $validated['image_unit'] = $request->file('image_unit')->store('inventory', 'public');
+        }
 
         $inventory->update($validated);
 
