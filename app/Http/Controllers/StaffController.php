@@ -4,13 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Models\Staff;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
 
 class StaffController extends Controller
 {
     public function index()
     {
         $staff = Staff::orderBy('name')->get();
+
         return view('staff.index', compact('staff'));
     }
 
@@ -30,7 +30,7 @@ class StaffController extends Controller
             $validated['password'] = $request->password;
         }
 
-        $validated['avatar'] = 'https://api.dicebear.com/7.x/avataaars/svg?seed=' . str_replace(' ', '', $validated['name']);
+        $validated['avatar'] = 'https://api.dicebear.com/7.x/avataaars/svg?seed='.str_replace(' ', '', $validated['name']);
         $validated['status'] = $request->status ?? 'Active';
 
         Staff::create($validated);
@@ -42,9 +42,9 @@ class StaffController extends Controller
     {
         $validated = $request->validate([
             'name' => 'string|max:255',
-            'email' => 'email|unique:staff,email,' . $staff->id,
+            'email' => 'email|unique:staff,email,'.$staff->id,
             'role' => 'string',
-            'username' => 'nullable|string|unique:staff,username,' . $staff->id,
+            'username' => 'nullable|string|unique:staff,username,'.$staff->id,
             'password' => 'nullable|string',
             'status' => 'string',
         ]);
@@ -65,6 +65,7 @@ class StaffController extends Controller
     public function destroy(Staff $staff)
     {
         $staff->delete();
+
         return redirect()->route('staff.index')->with('success', 'Personal eliminado.');
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Inventory;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 
 class InventoryController extends Controller
@@ -10,6 +11,7 @@ class InventoryController extends Controller
     public function index()
     {
         $inventory = Inventory::orderBy('name')->get();
+
         return view('inventory.index', compact('inventory'));
     }
 
@@ -59,6 +61,7 @@ class InventoryController extends Controller
     public function destroy(Inventory $inventory)
     {
         $inventory->delete();
+
         return redirect()->route('inventory.index')->with('success', 'Producto eliminado.');
     }
 
@@ -114,10 +117,11 @@ class InventoryController extends Controller
     public function downloadPdf()
     {
         $inventory = Inventory::orderBy('name')->get();
-        
+
         $html = view('pdf.inventory', compact('inventory'))->render();
-        
-        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadHTML($html);
-        return $pdf->download("Inventario_GranCanaveral_" . date('Y-m-d') . ".pdf");
+
+        $pdf = Pdf::loadHTML($html);
+
+        return $pdf->download('Inventario_GranCanaveral_'.date('Y-m-d').'.pdf');
     }
 }

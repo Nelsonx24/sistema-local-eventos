@@ -110,7 +110,7 @@
     </div>
 
     <!-- Close Event -->
-    @if($event->status !== 'Cerrado')
+    @if($event->event_status !== 'completed')
     <div class="mt-8 pt-8 border-t border-slate-200 flex flex-col items-center gap-4">
         <div class="text-center">
             <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Zona de Seguridad</p>

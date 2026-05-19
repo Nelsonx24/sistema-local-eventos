@@ -68,7 +68,7 @@
     </table>
 
     <div class="footer">
-        <p>Generado el: {{ now()->format('d/m/Y H:i') }}</p>
+        <p>Generado el: {{ now()->format('d/m/Y') }}</p>
     </div>
 </body>
 </html>

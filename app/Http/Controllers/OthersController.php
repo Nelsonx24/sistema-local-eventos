@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Asset;
 use App\Models\Config;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 
 class OthersController extends Controller
@@ -16,6 +17,7 @@ class OthersController extends Controller
     public function qr()
     {
         $qrImage = Config::getQR();
+
         return view('others.qr', compact('qrImage'));
     }
 
@@ -26,8 +28,8 @@ class OthersController extends Controller
         ]);
 
         if ($request->hasFile('qr_image')) {
-            $path = $request->file('qr_image')->store('qr', 'local');
-            Config::setQR(asset('storage/' . $path));
+            $path = $request->file('qr_image')->store('qr', 'public');
+            Config::setQR(asset('storage/'.$path));
         } else {
             Config::setQR($request->qr_url ?? Config::getQR());
         }
@@ -38,6 +40,7 @@ class OthersController extends Controller
     public function assets()
     {
         $assets = Asset::orderBy('category')->orderBy('name')->get();
+
         return view('others.assets', compact('assets'));
     }
 
@@ -58,12 +61,14 @@ class OthersController extends Controller
     public function destroyAsset(Asset $asset)
     {
         $asset->delete();
+
         return back()->with('success', 'Activo eliminado.');
     }
 
     public function contractSettings()
     {
         $settings = Config::getContractSettings();
+
         return view('others.contract-settings', compact('settings'));
     }
 
@@ -74,9 +79,15 @@ class OthersController extends Controller
             'representative' => 'required|string',
             'representative_ci' => 'required|string',
             'city' => 'required|string',
+            'watermark' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
         ]);
 
         Config::setContractSettings($validated);
+
+        if ($request->hasFile('watermark')) {
+            $path = $request->file('watermark')->store('watermarks', 'public');
+            Config::setWatermark($path);
+        }
 
         return back()->with('success', 'Configuración de contrato guardada.');
     }
@@ -89,10 +100,11 @@ class OthersController extends Controller
     public function downloadAssetsPdf()
     {
         $assets = Asset::orderBy('category')->orderBy('name')->get();
-        
+
         $html = view('pdf.assets', compact('assets'))->render();
-        
-        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadHTML($html);
-        return $pdf->download("Inventario_Activos_" . date('Y-m-d') . ".pdf");
+
+        $pdf = Pdf::loadHTML($html);
+
+        return $pdf->download('Inventario_Activos_'.date('Y-m-d').'.pdf');
     }
 }

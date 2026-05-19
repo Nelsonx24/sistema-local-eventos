@@ -27,6 +27,7 @@ class StaffAuthController extends Controller
         if ($staff && ($staff->password === $request->password || Hash::check($request->password, $staff->password))) {
             Auth::guard('staff')->login($staff);
             $request->session()->regenerate();
+
             return redirect()->intended('/dashboard');
         }
 
@@ -40,13 +41,15 @@ class StaffAuthController extends Controller
         Auth::guard('staff')->logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
+
         return redirect('/login');
     }
 
     public function authenticated(Request $request, $user)
     {
-        if (!$user->canAccess()) {
+        if (! $user->canAccess()) {
             Auth::guard('staff')->logout();
+
             return redirect('/login')->withErrors([
                 'username' => 'Este cargo no tiene acceso al sistema.',
             ]);

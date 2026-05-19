@@ -2,87 +2,96 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Reporte - {{ $event->client_name }}</title>
+    <title>{{ $title }}</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 30px; font-size: 11px; }
-        .header { text-align: center; margin-bottom: 20px; border-bottom: 2px solid #0f172a; padding-bottom: 15px; }
+        body { font-family: Arial, sans-serif; margin: 30px; font-size: 10px; }
+        .header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid #0f172a; padding-bottom: 15px; }
         .header h1 { font-size: 20px; color: #0f172a; margin: 0; }
-        .header .subtitle { color: #64748b; margin-top: 5px; }
-        .info-box { background: #f8fafc; padding: 15px; border-radius: 8px; margin-bottom: 20px; display: flex; justify-content: space-between; }
-        .info-item { text-align: center; }
-        .info-label { font-size: 10px; color: #64748b; text-transform: uppercase; }
-        .info-value { font-size: 14px; font-weight: bold; color: #0f172a; }
+        .header h2 { font-size: 14px; color: #334155; margin: 5px 0; font-weight: normal; }
+        .header p { color: #64748b; margin: 5px 0; }
+        .subtitle { font-size: 10px; color: #94a3b8; margin-top: 5px; }
         table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th { background: #0f172a; color: white; padding: 10px; text-align: left; font-size: 10px; text-transform: uppercase; }
-        td { padding: 10px; border-bottom: 1px solid #e2e8f0; }
-        .text-right { text-align: right; }
-        .text-center { text-align: center; }
-        .total-row { background: #0f172a; color: white; font-weight: bold; }
-        .total-label { text-align: right; padding-right: 20px; }
+        th { background: #0f172a; color: white; padding: 8px 6px; text-align: left; font-size: 9px; text-transform: uppercase; }
+        td { padding: 8px 6px; border-bottom: 1px solid #e2e8f0; }
+        .status-paid { color: #10b981; font-weight: bold; }
+        .status-pending { color: #f59e0b; font-weight: bold; }
+        .amount { text-align: right; font-weight: bold; }
+        .balance { text-align: right; color: #dc2626; }
+        .total-row { background: #f1f5f9; font-weight: bold; }
+        .total-row td { border-top: 2px solid #0f172a; padding: 10px 6px; }
         .footer { margin-top: 30px; text-align: center; color: #64748b; font-size: 10px; }
     </style>
 </head>
 <body>
     <div class="header">
-        <h1>RESUMEN DE VENTAS DE EVENTO</h1>
-        <p class="subtitle">Salón de Eventos Gran Cañaveral - Reporte de Evento</p>
-    </div>
-
-    <div class="info-box">
-        <div class="info-item">
-            <div class="info-label">Cliente</div>
-            <div class="info-value">{{ $event->client_name }}</div>
-        </div>
-        <div class="info-item">
-            <div class="info-label">Tipo de Evento</div>
-            <div class="info-value">{{ $event->event_type }}</div>
-        </div>
-        <div class="info-item">
-            <div class="info-label">Fecha</div>
-            <div class="info-value">{{ $event->date }}</div>
-        </div>
-        <div class="info-item">
-            <div class="info-label">Total Generado</div>
-            <div class="info-value" style="color: #3b82f6; font-size: 18px;">{{ number_format($totalAmount) }} Bs</div>
-        </div>
+        <h1>REPORTE DE EVENTOS</h1>
+        <h2>{{ $title }}</h2>
+        <p>Salón de Eventos Gran Cañaveral</p>
+        <p class="subtitle">Reporte generado el: {{ now()->format('d/m/Y') }}</p>
     </div>
 
     <table>
         <thead>
             <tr>
-                <th>Ticket</th>
+                <th>Fecha</th>
                 <th>Cliente</th>
-                <th>Vendedor</th>
-                <th>Items</th>
-                <th>Método</th>
-                <th class="text-right">Monto</th>
+                <th>Teléfono</th>
+                <th>Tipo</th>
+                <th class="text-right">Total</th>
+                <th class="text-right">Saldo</th>
+                <th>Estado</th>
+                <th>Pago</th>
             </tr>
         </thead>
         <tbody>
-            @foreach($sales as $sale)
+            @foreach($events as $event)
             <tr>
-                <td>#{{ $sale->id }}</td>
-                <td>{{ $sale->client_name }}</td>
-                <td>{{ $sale->seller_name ?? 'SISTEMA' }}</td>
+                <td>{{ $event->date->format('d/m/Y') }}</td>
+                <td>{{ $event->client_name }}</td>
+                <td>{{ $event->client_phone ?? '—' }}</td>
+                <td>{{ $event->event_type }}</td>
+                <td class="amount">{{ number_format($event->total_amount) }} Bs</td>
+                <td class="balance">{{ number_format($event->balance_pending) }} Bs</td>
                 <td>
-                    @foreach($sale->items as $item)
-                        {{ $item->quantity }} {{ $item->type }}x {{ $item->name }}<br>
-                    @endforeach
+                    @if($event->event_status === 'completed')
+                    <span style="color:#64748b;font-weight:bold;">Finalizado</span>
+                    @elseif($event->event_status === 'cancelled')
+                    <span style="color:#dc2626;font-weight:bold;">Cancelado</span>
+                    @else
+                    <span style="color:#3b82f6;font-weight:bold;">Próximo</span>
+                    @endif
                 </td>
-                <td class="text-center">{{ $sale->payment_method }}</td>
-                <td class="text-right">{{ number_format($sale->amount) }} Bs</td>
+                <td>
+                    @if($event->payment_status === 'paid')
+                    <span class="status-paid">Pagado</span>
+                    @elseif($event->payment_status === 'cancelled')
+                    <span style="color:#dc2626;font-weight:bold;">Cancelado</span>
+                    @else
+                    <span class="status-pending">Pendiente</span>
+                    @endif
+                </td>
             </tr>
             @endforeach
-            <tr class="total-row">
-                <td colspan="5" class="total-label">TOTAL:</td>
-                <td class="text-right">{{ number_format($totalAmount) }} Bs</td>
+            @if($events->isEmpty())
+            <tr>
+                <td colspan="8" class="text-center" style="color: #94a3b8; padding: 30px;">No se encontraron eventos</td>
             </tr>
+            @endif
         </tbody>
+        @if($events->isNotEmpty())
+        <tfoot>
+            <tr class="total-row">
+                <td colspan="4" style="text-align: right;">TOTALES:</td>
+                <td class="amount">{{ number_format($events->sum('total_amount')) }} Bs</td>
+                <td class="balance">{{ number_format($events->sum('balance_pending')) }} Bs</td>
+                <td colspan="2"></td>
+            </tr>
+        </tfoot>
+        @endif
     </table>
 
     <div class="footer">
-        <p>Generado el: {{ now()->format('d/m/Y H:i') }}</p>
-        <p>Gran Cañaveral - Sistema de Gestión Administrativa</p>
+        <p>Gran Cañaveral - Sistema de Gestión de Eventos</p>
     </div>
 </body>
 </html>

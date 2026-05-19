@@ -56,7 +56,7 @@ class Staff extends Authenticatable
 
     public function getRoleLabelAttribute(): string
     {
-        return match($this->role) {
+        return match ($this->role) {
             'Administrador' => 'Administrador',
             'Vendedor' => 'Vendedor',
             'CM' => 'CM',

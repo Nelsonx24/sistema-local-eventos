@@ -16,6 +16,7 @@ class Config extends Model
     public static function get(string $key, $default = null)
     {
         $config = static::where('key', $key)->first();
+
         return $config ? $config->value : $default;
     }
 
@@ -40,6 +41,7 @@ class Config extends Model
     public static function getEventTypes(): array
     {
         $types = static::get('event_types');
+
         return $types ? json_decode($types, true) : ['Boda', 'Corporativo', 'Cumpleaños', 'Social'];
     }
 
@@ -51,16 +53,27 @@ class Config extends Model
     public static function getContractSettings(): array
     {
         $settings = static::get('contract_settings');
+
         return $settings ? json_decode($settings, true) : [
             'salon_name' => 'Salón de Eventos GRAN CAÑAVERAL',
             'representative' => 'CINTHIA FLORES CHOQUE',
             'representative_ci' => '____________________',
-            'city' => 'Cochabamba'
+            'city' => 'Cochabamba',
         ];
     }
 
     public static function setContractSettings(array $settings): void
     {
         static::set('contract_settings', json_encode($settings));
+    }
+
+    public static function getWatermark(): string
+    {
+        return static::get('watermark', '');
+    }
+
+    public static function setWatermark(string $path): void
+    {
+        static::set('watermark', $path);
     }
 }

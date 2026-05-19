@@ -17,7 +17,7 @@ class DashboardController extends Controller
         $endOfMonth = $now->copy()->endOfMonth();
 
         $eventsThisMonth = Event::whereBetween('date', [$startOfMonth, $endOfMonth])->count();
-        
+
         $salesThisMonth = Sale::whereBetween('date', [$startOfMonth, $endOfMonth])->get();
         $monthlyRevenue = $salesThisMonth->sum('amount');
 
@@ -39,17 +39,17 @@ class DashboardController extends Controller
     {
         $weeks = [];
         $now = Carbon::now();
-        
+
         for ($i = 3; $i >= 0; $i--) {
             $weekStart = $now->copy()->subWeeks($i)->startOfWeek();
             $weekEnd = $weekStart->copy()->endOfWeek();
-            
+
             $sales = Sale::whereBetween('date', [$weekStart, $weekEnd])->get();
             $total = $sales->sum('amount');
-            
+
             $weeks[] = [
-                'name' => 'Sem ' . (4 - $i),
-                'value' => $total
+                'name' => 'Sem '.(4 - $i),
+                'value' => $total,
             ];
         }
 

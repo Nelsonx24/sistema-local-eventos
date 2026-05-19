@@ -22,7 +22,7 @@
                     <p class="text-xs text-slate-500">{{ $event->event_type }} • {{ $event->date }}</p>
                     <div class="mt-2 flex items-center gap-2">
                         <span class="text-[10px] font-bold px-2 py-0.5 bg-slate-100 rounded-full text-slate-600 uppercase tracking-wider">{{ $event->id }}</span>
-                        <span class="text-[10px] font-bold px-2 py-0.5 bg-green-50 text-green-600 rounded-full uppercase tracking-wider">{{ $event->status }}</span>
+                        <span class="text-[10px] font-bold px-2 py-0.5 bg-blue-50 text-blue-600 rounded-full uppercase tracking-wider">{{ $event->event_status === 'completed' ? 'Finalizado' : ($event->event_status === 'cancelled' ? 'Cancelado' : 'Próximo') }}</span>
                     </div>
                 </div>
             </div>

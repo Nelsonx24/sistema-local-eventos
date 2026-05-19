@@ -22,7 +22,7 @@
     <div class="header">
         <h1>INVENTARIO GENERAL</h1>
         <p>Salón de Eventos Gran Cañaveral</p>
-        <p>Generado el: {{ now()->format('d/m/Y H:i') }}</p>
+        <p>Generado el: {{ now()->format('d/m/Y') }}</p>
     </div>
 
     <table>

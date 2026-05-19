@@ -28,10 +28,30 @@
         </div>
 
         <div class="flex flex-wrap gap-2">
-            <a href="{{ route('events.calendar-pdf') }}" target="_blank" class="bg-emerald-50 text-emerald-700 px-4 py-2 rounded-lg flex items-center gap-2 text-sm font-bold hover:bg-emerald-100 transition-all border border-emerald-200 shadow-sm">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
-                Exportar PDF
-            </a>
+            <div class="relative" x-data="{ open: false }">
+                <button @click="open = !open" class="bg-emerald-50 text-emerald-700 px-4 py-2 rounded-lg flex items-center gap-2 text-sm font-bold hover:bg-emerald-100 transition-all border border-emerald-200 shadow-sm">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+                    Reportes
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" :class="open ? 'rotate-180' : ''" class="transition-transform"><path d="m6 9 6 6 6-6"/></svg>
+                </button>
+                <div x-show="open" @click.outside="open = false" class="absolute top-full left-0 mt-2 w-72 bg-white rounded-xl shadow-xl border border-slate-200 py-2 z-50" style="display: none;">
+                    <a href="{{ route('events.calendar-pdf') }}" target="_blank" class="flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-emerald-600"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
+                        <div>
+                            <p class="font-bold text-slate-800">Calendario Actual</p>
+                            <p class="text-xs text-slate-500 font-normal">Eventos próximos en calendario PDF</p>
+                        </div>
+                    </a>
+                    <hr class="mx-3 border-slate-100">
+                    <button onclick="openModal('report-filter-modal')" class="w-full text-left flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-blue-600"><path d="M4 7V4h16v3"/><path d="M9 20h6"/><path d="M12 4v16"/></svg>
+                        <div>
+                            <p class="font-bold text-slate-800">Reporte por Fechas</p>
+                            <p class="text-xs text-slate-500 font-normal">Filtrar por año, mes o rango de fechas</p>
+                        </div>
+                    </button>
+                </div>
+            </div>
             <button onclick="openModal('types-modal')" class="bg-slate-100 text-slate-700 px-4 py-2 rounded-lg flex items-center gap-2 text-sm font-bold hover:bg-slate-200 transition-all border border-slate-200 shadow-sm">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" x2="21" y1="6" y2="6"/><line x1="8" x2="21" y1="12" y2="12"/><line x1="8" x2="21" y1="18" y2="18"/><line x1="3" x2="3.01" y1="6" y2="6"/><line x1="3" x2="3.01" y1="12" y2="12"/><line x1="3" x2="3.01" y1="18" y2="18"/></svg>
                 Tipos
@@ -77,35 +97,34 @@
                             <p class="text-[0.75rem] font-bold text-slate-900 mb-0.5">{{ $event->id }}</p>
                             <div class="flex items-center gap-1.5 text-slate-400">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
-                                <span class="text-[0.7rem] font-medium">{{ $event->date }}</span>
+                                <span class="text-[0.7rem] font-medium">{{ $event->date->format('d/m/Y') }}</span>
                             </div>
                         </td>
                     <td class="px-6 py-4">
                         <p class="text-[0.875rem] font-bold text-slate-800 leading-tight">{{ $event->client_name }}</p>
-                        <p class="text-[0.7rem] text-slate-400 mt-1">{{ $event->guests }} pax</p>
                     </td>
                     <td class="px-6 py-4 text-center">
                         <span class="px-3 py-1 rounded-full text-[0.65rem] font-bold border {{ $event->event_type === 'Boda' ? 'bg-blue-50 text-blue-700 border-blue-100' : ($event->event_type === 'Corporativo' ? 'bg-purple-50 text-purple-700 border-purple-100' : 'bg-emerald-50 text-emerald-700 border-emerald-100') }}">
                             {{ $event->event_type }}
                         </span>
                     </td>
-                    <td class="px-6 py-4 text-center">
-                        @if($event->signed_contract_url)
-                        <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-50 text-emerald-700 rounded-full text-[0.65rem] font-bold border border-emerald-100">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-                            Firmado
-                        </span>
-                        @else
-                        <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-slate-50 text-slate-400 rounded-full text-[0.65rem] font-bold border border-slate-200">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>
-                            Pendiente
-                        </span>
-                        @endif
+                    <td class="px-6 py-4">
+                        <div class="flex flex-col items-center gap-1">
+                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[0.6rem] font-bold border {{ $event->payment_status === 'paid' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : ($event->payment_status === 'cancelled' ? 'bg-red-50 text-red-700 border-red-200' : 'bg-amber-50 text-amber-700 border-amber-200') }}">
+                                {{ $event->payment_status === 'paid' ? 'Pagado' : ($event->payment_status === 'cancelled' ? 'Cancelado' : 'Pte. Pago') }}
+                            </span>
+                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[0.6rem] font-bold border {{ $event->event_status === 'completed' ? 'bg-slate-100 text-slate-600 border-slate-200' : ($event->event_status === 'cancelled' ? 'bg-red-50 text-red-700 border-red-200' : 'bg-blue-50 text-blue-700 border-blue-200') }}">
+                                {{ $event->event_status === 'completed' ? 'Finalizado' : ($event->event_status === 'cancelled' ? 'Cancelado' : 'Próximo') }}
+                            </span>
+                        </div>
                     </td>
                     <td class="px-6 py-4">
                         <div class="flex items-center justify-end gap-2 text-slate-400">
                             <button onclick="viewEvent({{ $event->id }})" class="p-2 hover:bg-slate-100 hover:text-brand-accent rounded-lg transition-all" title="Ver Detalles">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+                            </button>
+                            <button onclick="editEvent({{ $event->id }})" class="p-2 hover:bg-slate-100 hover:text-amber-600 rounded-lg transition-all" title="Editar">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.83 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
                             </button>
                             <a href="{{ route('events.download-contract', $event->id) }}" target="_blank" class="p-2 hover:bg-slate-100 hover:text-blue-600 rounded-lg transition-all" title="Descargar Contrato">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
@@ -151,8 +170,15 @@
             </div>
             <div class="grid grid-cols-2 gap-4">
                 <div class="flex flex-col gap-1.5">
+                    <label class="text-[0.65rem] font-bold text-text-muted uppercase tracking-widest">Teléfono / Contacto</label>
+                    <input type="text" name="client_phone" class="px-4 py-2 bg-slate-50 border border-border-subtle rounded-[6px] text-sm outline-none">
+                </div>
+                <div></div>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+                <div class="flex flex-col gap-1.5">
                     <label class="text-[0.65rem] font-bold text-text-muted uppercase tracking-widest">Fecha</label>
-                    <input type="date" name="date" required class="px-3 py-2 bg-slate-50 border border-border-subtle rounded-[6px] text-sm outline-none">
+                    <input type="date" name="date" id="event-date-input" required class="px-3 py-2 bg-slate-50 border border-border-subtle rounded-[6px] text-sm outline-none">
                 </div>
                 <div class="flex flex-col gap-1.5">
                     <label class="text-[0.65rem] font-bold text-text-muted uppercase tracking-widest">Tipo</label>
@@ -165,26 +191,94 @@
             </div>
             <div class="grid grid-cols-2 gap-4">
                 <div class="flex flex-col gap-1.5">
-                    <label class="text-[0.65rem] font-bold text-text-muted uppercase tracking-widest">Invitados</label>
-                    <input type="number" name="guests" required class="px-4 py-2 bg-slate-50 border border-border-subtle rounded-[6px] text-sm outline-none">
-                </div>
-                <div class="flex flex-col gap-1.5">
                     <label class="text-[0.65rem] font-bold text-text-muted uppercase tracking-widest">Monto Total ($)</label>
                     <input type="number" name="total_amount" required class="px-4 py-2 bg-slate-50 border border-border-subtle rounded-[6px] text-sm outline-none">
                 </div>
-            </div>
-            <div class="grid grid-cols-2 gap-4">
                 <div class="flex flex-col gap-1.5">
                     <label class="text-[0.65rem] font-bold text-text-muted uppercase tracking-widest">Adelanto ($)</label>
                     <input type="number" name="advance_payment" required class="px-4 py-2 bg-emerald-50 border border-emerald-100 rounded-[6px] text-sm outline-none text-emerald-800">
                 </div>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
                 <div class="flex flex-col gap-1.5">
                     <label class="text-[0.65rem] font-bold text-text-muted uppercase tracking-widest">Fecha Límite Pago</label>
-                    <input type="date" name="payment_due_date" required class="px-4 py-2 bg-amber-50 border border-amber-100 rounded-[6px] text-sm outline-none text-amber-800">
+                    <div class="px-4 py-2 bg-amber-50 border border-amber-100 rounded-[6px] text-sm text-amber-800 font-medium flex items-center justify-between gap-2">
+                        <span id="payment-due-display">—</span>
+                        <span class="text-[0.55rem] text-amber-500 font-normal">(1 día antes del evento)</span>
+                    </div>
+                    <input type="hidden" name="payment_due_date" id="payment-due-input">
                 </div>
             </div>
             <button type="submit" class="mt-4 bg-brand-accent text-white py-2.5 rounded-[6px] font-bold hover:bg-blue-600 transition-all shadow-md">
                 Confirmar Reserva
+            </button>
+        </form>
+    </div>
+</div>
+
+<!-- Edit Event Modal -->
+<div id="edit-event-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm hidden">
+    <div class="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden border border-border-subtle">
+        <div class="flex justify-between items-center px-6 py-4 border-b border-border-subtle bg-slate-50">
+            <h3 class="font-bold text-text-main">Editar Evento</h3>
+            <button onclick="closeModal('edit-event-modal')" class="text-text-muted hover:text-text-main transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+            </button>
+        </div>
+        <form id="edit-event-form" method="POST" class="p-6 flex flex-col gap-4">
+            @csrf
+            @method('PUT')
+            <div class="flex flex-col gap-1.5">
+                <label class="text-[0.65rem] font-bold text-text-muted uppercase tracking-widest">Nombre del Cliente</label>
+                <input type="text" name="client_name" id="edit-client_name" required class="px-4 py-2 bg-slate-50 border border-border-subtle rounded-[6px] text-sm focus:ring-1 focus:ring-brand-accent/40 outline-none">
+            </div>
+            <div class="flex flex-col gap-1.5">
+                <label class="text-[0.65rem] font-bold text-text-muted uppercase tracking-widest">CI / Documento</label>
+                <input type="text" name="client_id" id="edit-client_id" required class="px-4 py-2 bg-slate-50 border border-border-subtle rounded-[6px] text-sm focus:ring-1 focus:ring-brand-accent/40 outline-none">
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-[0.65rem] font-bold text-text-muted uppercase tracking-widest">Teléfono / Contacto</label>
+                    <input type="text" name="client_phone" id="edit-client_phone" class="px-4 py-2 bg-slate-50 border border-border-subtle rounded-[6px] text-sm outline-none">
+                </div>
+                <div></div>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-[0.65rem] font-bold text-text-muted uppercase tracking-widest">Fecha</label>
+                    <input type="date" name="date" id="edit-date" required class="px-3 py-2 bg-slate-50 border border-border-subtle rounded-[6px] text-sm outline-none">
+                </div>
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-[0.65rem] font-bold text-text-muted uppercase tracking-widest">Tipo</label>
+                    <select name="event_type" id="edit-event_type" class="px-3 py-2 bg-slate-50 border border-border-subtle rounded-[6px] text-sm outline-none">
+                        @foreach($eventTypes as $type)
+                        <option value="{{ $type }}">{{ $type }}</option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-[0.65rem] font-bold text-text-muted uppercase tracking-widest">Monto Total ($)</label>
+                    <input type="number" name="total_amount" id="edit-total_amount" required class="px-4 py-2 bg-slate-50 border border-border-subtle rounded-[6px] text-sm outline-none">
+                </div>
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-[0.65rem] font-bold text-text-muted uppercase tracking-widest">Adelanto ($)</label>
+                    <input type="number" name="advance_payment" id="edit-advance_payment" required class="px-4 py-2 bg-emerald-50 border border-emerald-100 rounded-[6px] text-sm outline-none text-emerald-800">
+                </div>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-[0.65rem] font-bold text-text-muted uppercase tracking-widest">Fecha Límite Pago</label>
+                    <div class="px-4 py-2 bg-amber-50 border border-amber-100 rounded-[6px] text-sm text-amber-800 font-medium flex items-center justify-between gap-2">
+                        <span id="edit-payment-due-display">—</span>
+                        <span class="text-[0.55rem] text-amber-500 font-normal">(1 día antes del evento)</span>
+                    </div>
+                    <input type="hidden" name="payment_due_date" id="edit-payment-due-input">
+                </div>
+            </div>
+            <button type="submit" class="mt-4 bg-amber-500 text-white py-2.5 rounded-[6px] font-bold hover:bg-amber-600 transition-all shadow-md">
+                Guardar Cambios
             </button>
         </form>
     </div>
@@ -285,12 +379,10 @@ function renderCalendar() {
     
     let html = '';
     
-    // Empty cells before first day
     for (let i = 0; i < startDay; i++) {
         html += '<div class="min-h-[120px] bg-slate-50/50 border-r border-b border-slate-100"></div>';
     }
     
-    // Days of month
     for (let day = 1; day <= daysInMonth; day++) {
         const monthStr = String(month + 1).padStart(2, '0');
         const dayStr = String(day).padStart(2, '0');
@@ -315,7 +407,6 @@ function renderCalendar() {
         html += `</div></div>`;
     }
     
-    // Remaining cells
     const remainingCells = 7 - ((startDay + daysInMonth) % 7);
     if (remainingCells < 7) {
         for (let i = 0; i < remainingCells; i++) {
@@ -335,6 +426,53 @@ function viewEvent(id) {
         })
         .catch(() => alert('Error al cargar los detalles del evento'));
 }
+
+function editEvent(id) {
+    fetch(`/events/${id}/edit-data`)
+        .then(res => res.json())
+        .then(data => {
+            document.getElementById('edit-client_name').value = data.client_name;
+            document.getElementById('edit-client_id').value = data.client_id;
+            document.getElementById('edit-client_phone').value = data.client_phone || '';
+            document.getElementById('edit-date').value = data.date;
+            document.getElementById('edit-event_type').value = data.event_type;
+
+            document.getElementById('edit-total_amount').value = data.total_amount;
+            document.getElementById('edit-advance_payment').value = data.advance_payment;
+
+            const dueDate = new Date(data.date);
+            dueDate.setDate(dueDate.getDate() - 1);
+            const y = dueDate.getFullYear();
+            const m = String(dueDate.getMonth() + 1).padStart(2, '0');
+            const d = String(dueDate.getDate()).padStart(2, '0');
+            document.getElementById('edit-payment-due-input').value = `${y}-${m}-${d}`;
+            document.getElementById('edit-payment-due-display').textContent = `${d}/${m}/${y}`;
+
+            document.getElementById('edit-event-form').action = `/events/${id}`;
+            openModal('edit-event-modal');
+        })
+        .catch(() => alert('Error al cargar datos del evento'));
+}
+
+document.getElementById('edit-date').addEventListener('change', function() {
+    const date = new Date(this.value);
+    date.setDate(date.getDate() - 1);
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, '0');
+    const d = String(date.getDate()).padStart(2, '0');
+    document.getElementById('edit-payment-due-input').value = `${y}-${m}-${d}`;
+    document.getElementById('edit-payment-due-display').textContent = `${d}/${m}/${y}`;
+});
+
+document.getElementById('event-date-input').addEventListener('change', function() {
+    const date = new Date(this.value);
+    date.setDate(date.getDate() - 1);
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, '0');
+    const d = String(date.getDate()).padStart(2, '0');
+    document.getElementById('payment-due-input').value = `${y}-${m}-${d}`;
+    document.getElementById('payment-due-display').textContent = `${d}/${m}/${y}`;
+});
 
 function deleteEvent(id) {
     if (confirm('¿Estás seguro de eliminar este evento?')) {
@@ -356,6 +494,62 @@ function deleteEvent(id) {
             </button>
         </div>
         <div id="event-detail-content" class="p-6"></div>
+    </div>
+</div>
+
+<!-- Report Filter Modal -->
+<div id="report-filter-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm hidden">
+    <div class="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden border border-border-subtle">
+        <div class="flex justify-between items-center px-6 py-4 border-b border-border-subtle bg-slate-50">
+            <h3 class="font-bold text-text-main">Reporte por Fechas</h3>
+            <button onclick="closeModal('report-filter-modal')" class="text-text-muted hover:text-text-main">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+            </button>
+        </div>
+        <form method="GET" action="{{ route('events.report-pdf') }}" target="_blank" class="p-6 space-y-5" onsubmit="closeModal('report-filter-modal')">
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Año</label>
+                    <select name="year" class="w-full px-3 py-2.5 rounded-lg border border-slate-200 text-sm font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-brand-accent/30 focus:border-brand-accent bg-white">
+                        <option value="">Todos</option>
+                        @for($y = now()->year; $y >= now()->year - 5; $y--)
+                        <option value="{{ $y }}">{{ $y }}</option>
+                        @endfor
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Mes</label>
+                    <select name="month" class="w-full px-3 py-2.5 rounded-lg border border-slate-200 text-sm font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-brand-accent/30 focus:border-brand-accent bg-white">
+                        <option value="">Todos</option>
+                        @foreach(['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'] as $i => $m)
+                        <option value="{{ $i + 1 }}" {{ (now()->month === $i + 1) ? 'selected' : '' }}>{{ $m }}</option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+            <div class="border-t border-slate-100 pt-4">
+                <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">O filtrar por rango de fechas</p>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Desde</label>
+                        <input type="date" name="from" class="w-full px-3 py-2.5 rounded-lg border border-slate-200 text-sm font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-brand-accent/30 focus:border-brand-accent">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Hasta</label>
+                        <input type="date" name="to" class="w-full px-3 py-2.5 rounded-lg border border-slate-200 text-sm font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-brand-accent/30 focus:border-brand-accent">
+                    </div>
+                </div>
+            </div>
+            <div class="flex gap-3 pt-2">
+                <button type="submit" class="flex-1 bg-brand-primary text-white px-4 py-2.5 rounded-lg text-sm font-bold hover:bg-slate-800 transition-all shadow-md">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="inline mr-1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+                    Generar PDF
+                </button>
+                <button type="button" onclick="closeModal('report-filter-modal')" class="px-4 py-2.5 rounded-lg text-sm font-bold text-slate-600 hover:bg-slate-100 transition-all border border-slate-200">
+                    Cancelar
+                </button>
+            </div>
+        </form>
     </div>
 </div>
 @endsection

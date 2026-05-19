@@ -2,15 +2,16 @@
 
 namespace App\Console\Commands;
 
+use App\Models\Config;
+use App\Models\Staff;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
-use App\Models\Staff;
-use App\Models\Config;
 
 class InstallSystem extends Command
 {
     protected $signature = 'app:install-system';
+
     protected $description = 'Instalar el sistema Gran Cañaveral';
 
     public function handle()
@@ -18,18 +19,19 @@ class InstallSystem extends Command
         $this->info('=====================================');
         $this->info('  INSTALANDO SISTEMA GRAN CAÑAVERAL');
         $this->info('=====================================');
-        
+
         try {
             DB::connection()->getPdo();
             $this->info('✓ Conexión a MySQL establecida');
         } catch (\Exception $e) {
             $this->error('✗ Error: No se puede conectar a MySQL');
             $this->error('  Verifica tu archivo .env y que MySQL esté ejecutándose');
+
             return 1;
         }
 
         $this->info('Creando tablas...');
-        
+
         Schema::create('staff', function ($t) {
             $t->id();
             $t->string('name');
@@ -50,15 +52,16 @@ class InstallSystem extends Command
             $t->string('client_id');
             $t->string('event_type');
             $t->date('date');
-            $t->integer('guests');
             $t->string('status')->default('Pendiente');
+            $t->string('payment_status', 20)->default('pending');
+            $t->string('event_status', 20)->default('upcoming');
             $t->decimal('total_amount', 12, 2);
             $t->decimal('advance_payment', 12, 2);
             $t->decimal('balance_pending', 12, 2);
             $t->date('payment_due_date');
             $t->string('signed_contract_url')->nullable();
-            $t->string('seller_name')->nullable();
-            $t->timestamps();
+            $t->string('registered_by')->nullable();
+            $t->softDeletes();
         });
         $this->info('  ✓ events');
 
@@ -169,7 +172,7 @@ class InstallSystem extends Command
         $this->info('');
         $this->info('Ahora ejecuta: php artisan serve');
         $this->info('Y visita: http://localhost:8000');
-        
+
         return 0;
     }
 }

@@ -16,16 +16,18 @@
     </style>
 </head>
 <body>
+    @if($watermark)
+    <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; text-align: center; padding-top: 25%; opacity: 0.1;">
+        <img src="{{ $watermark }}" style="width: 80%;">
+    </div>
+    @endif
     <div class="header">
         <h1>CONTRATO DE PRESTACIÓN DE SERVICIOS</h1>
         <p>"{{ strtoupper($settings['salon_name']) }}"</p>
     </div>
 
     <div class="section text-justify">
-        <p><strong>Entre las partes:</strong></p>
-        <p>Por una parte, <strong>{{ $event->client_name }}</strong>, con documento de identidad N° {{ $event->client_id }}, en adelante denominado/a "EL CLIENTE".</p>
-        <p>Y por otra parte, <strong>{{ $settings['representative'] }}</strong>, representante legal del {{ $settings['salon_name'] }}, en adelante denominado "EL PROVEEDOR".</p>
-        <p>Ambas partes acuerdan celebrar el presente contrato de prestación de servicios, el cual se regirá por las siguientes cláusulas:</p>
+        <p>Por una parte, <strong>{{ $event->client_name }}</strong>, con documento de identidad N° {{ $event->client_id }}{{ $event->client_phone ? ', teléfono '.$event->client_phone : '' }}, en adelante denominado/a "EL CLIENTE". Y por otra parte, <strong>{{ $settings['representative'] }}</strong>, representante legal del {{ $settings['salon_name'] }}, en adelante denominado "EL PROVEEDOR". Ambas partes acuerdan celebrar el presente contrato de prestación de servicios, el cual se regirá por las siguientes cláusulas:</p>
     </div>
 
     <div class="section">
@@ -47,13 +49,14 @@
 
     <div class="section">
         <p class="section-title">TERCERA: FECHA, DURACIÓN Y HORARIO</p>
-        <p class="text-justify">El evento se realizará el día <strong>{{ $event->date }}</strong>.</p>
+        <p class="text-justify">El evento se realizará el día <strong>{{ $event->date->format('d/m/Y') }}</strong>.</p>
         <p>Horario establecido:</p>
         <ul>
             <li>Inicio: 08:00 a.m.</li>
-            <li>Finalización: 11:59 p.m.</li>
+            <li>Finalización: 23:59 p.m.</li>
         </ul>
-        <p>En caso de eventos de más de un día, el uso del salón se extenderá desde las 08:00 a.m. hasta las 06:00 p.m. del día siguiente, previa coordinación.</p>
+        <p>En caso de eventos de más de un día, el uso del salón se extenderá desde las 14:00 p.m. hasta las 20:00 p.m. del día siguiente, previa coordinación.</p>
+        <p>En caso de que el evento exceda el tiempo límite de servicio y uso del local establecido en el presente contrato, EL CLIENTE deberá abonar un recargo adicional equivalente al 20% del monto total contratado.</p>
     </div>
 
     <div class="section">
@@ -62,7 +65,7 @@
         <p>Forma de pago:</p>
         <ul>
             <li>Anticipo: <strong>Bs. {{ number_format($event->advance_payment) }}</strong> al momento de la firma del contrato</li>
-            <li>Saldo restante: deberá ser cancelado hasta <strong>{{ $event->payment_due_date }}</strong></li>
+            <li>Saldo restante: deberá ser cancelado hasta <strong>{{ \Carbon\Carbon::parse($event->payment_due_date)->format('d/m/Y') }}</strong></li>
         </ul>
         <p>El incumplimiento de pago dentro del plazo establecido podrá generar la suspensión del servicio sin derecho a reclamo.</p>
     </div>
@@ -80,37 +83,35 @@
     </div>
 
     <div class="section">
-        <p class="section-title">SEXTA: CANCELACIONES</p>
-        <p class="text-justify">En caso de cancelación por parte del CLIENTE:</p>
-        <ul>
-            <li>Con más de 30 días de anticipación: devolución del 50% del anticipo</li>
-            <li>Con menos de 30 días: no habrá devolución del anticipo</li>
-        </ul>
+        <p class="section-title">SÉPTIMA: CANCELACIONES</p>
+        <p class="text-justify">En caso de cancelación del evento por parte de EL CLIENTE, el monto entregado como adelanto no será reembolsable bajo ninguna circunstancia, debido a que dicho pago garantiza la reserva de la fecha y la disponibilidad del salón.</p>
         <p>En caso de fuerza mayor debidamente justificada, ambas partes podrán renegociar la fecha del evento.</p>
     </div>
 
     <div class="section">
-        <p class="section-title">SÉPTIMA: DAÑOS, PÉRDIDAS Y MULTAS</p>
+        <p class="section-title">OCTAVA: DAÑOS, PÉRDIDAS Y MULTAS</p>
         <p class="text-justify">Cualquier daño ocasionado a las instalaciones, mobiliario o equipos será responsabilidad del CLIENTE, quien deberá cubrir los costos de reparación o reposición.</p>
     </div>
 
     <div class="section">
-        <p class="section-title">OCTAVA: ACEPTACIÓN</p>
+        <p class="section-title">NOVENA: ACEPTACIÓN</p>
         <p class="text-justify">Ambas partes declaran haber leído y aceptado todas las cláusulas del presente contrato, firmando en señal de conformidad.</p>
     </div>
 
-    <div class="signature">
-        <div class="signature-box">
-            <div class="signature-line">EL CLIENTE</div>
-            <p>{{ $event->client_name }}</p>
-            <p>CI: {{ $event->client_id }}</p>
-        </div>
-        <div class="signature-box">
-            <div class="signature-line">EL PROVEEDOR</div>
-            <p>{{ $settings['representative'] }}</p>
-            <p>CI: {{ $settings['representative_ci'] }}</p>
-        </div>
-    </div>
+    <table style="width: 100%; margin-top: 140px;">
+        <tr>
+            <td style="width: 50%; text-align: center; padding: 0 10px;">
+                <div style="border-top: 1px solid #000; padding-top: 5px;">EL CLIENTE</div>
+                <p>{{ $event->client_name }}</p>
+                <p>CI: {{ $event->client_id }}</p>
+            </td>
+            <td style="width: 50%; text-align: center; padding: 0 10px;">
+                <div style="border-top: 1px solid #000; padding-top: 5px;">EL PROVEEDOR</div>
+                <p>{{ $settings['representative'] }}</p>
+                <p>CI: {{ $settings['representative_ci'] }}</p>
+            </td>
+        </tr>
+    </table>
 
     <div style="margin-top: 30px; text-align: center; font-size: 10px;">
         <p>Firmado en la ciudad de {{ $settings['city'] }}, el día {{ date('d/m/Y') }}</p>

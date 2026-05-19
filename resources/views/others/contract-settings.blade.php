@@ -22,7 +22,7 @@
     </div>
 
     <div class="bg-white p-8 rounded-[2.5rem] border border-slate-200 shadow-sm space-y-6">
-        <form method="POST" action="{{ route('others.contract-settings.update') }}">
+        <form method="POST" action="{{ route('others.contract-settings.update') }}" enctype="multipart/form-data">
             @csrf
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div class="flex flex-col gap-2">
@@ -40,6 +40,28 @@
                 <div class="flex flex-col gap-2">
                     <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Ciudad de Firma</label>
                     <input type="text" name="city" value="{{ $settings['city'] }}" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium">
+                </div>
+            </div>
+
+            <hr class="my-6 border-slate-200">
+
+            <div class="flex flex-col gap-4">
+                <h4 class="text-sm font-bold text-slate-700 uppercase tracking-widest">Marca de Agua</h4>
+                <div class="flex items-center gap-6">
+                    <div class="flex flex-col gap-2 flex-1">
+                        <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Imagen para marca de agua</label>
+                        <input type="file" name="watermark" accept="image/*" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:bg-indigo-50 file:text-indigo-700 file:font-bold file:text-xs hover:file:bg-indigo-100">
+                        <p class="text-[10px] text-slate-400">Recomendado: PNG con transparencia, máximo 2MB. Aparecerá al centro del contrato.</p>
+                    </div>
+                    @php
+                        $watermarkPath = \App\Models\Config::getWatermark();
+                        $watermarkExists = $watermarkPath && file_exists(storage_path('app/public/'.$watermarkPath));
+                    @endphp
+                    @if($watermarkExists)
+                    <div class="w-20 h-20 rounded-xl border border-slate-200 overflow-hidden bg-slate-50 shrink-0">
+                        <img src="{{ asset('storage/'.$watermarkPath) }}" class="w-full h-full object-contain">
+                    </div>
+                    @endif
                 </div>
             </div>
             

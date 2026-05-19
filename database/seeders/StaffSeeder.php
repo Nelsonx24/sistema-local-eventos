@@ -2,8 +2,8 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
 use App\Models\Staff;
+use Illuminate\Database\Seeder;
 
 class StaffSeeder extends Seeder
 {

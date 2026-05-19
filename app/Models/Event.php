@@ -5,26 +5,29 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Event extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $table = 'events';
 
     protected $fillable = [
         'client_name',
         'client_id',
+        'client_phone',
         'event_type',
         'date',
-        'guests',
         'status',
+        'payment_status',
+        'event_status',
         'total_amount',
         'advance_payment',
         'balance_pending',
         'payment_due_date',
         'signed_contract_url',
-        'seller_name',
+        'registered_by',
     ];
 
     protected function casts(): array
@@ -35,7 +38,9 @@ class Event extends Model
             'total_amount' => 'decimal:2',
             'advance_payment' => 'decimal:2',
             'balance_pending' => 'decimal:2',
-            'guests' => 'integer',
+            'status' => 'string',
+            'payment_status' => 'string',
+            'event_status' => 'string',
         ];
     }
 
@@ -71,7 +76,7 @@ class Event extends Model
 
     public function getStatusColorAttribute(): string
     {
-        return match($this->status) {
+        return match ($this->status) {
             'Confirmado' => 'emerald',
             'Pendiente' => 'amber',
             'Cancelado' => 'red',

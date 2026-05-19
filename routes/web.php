@@ -4,11 +4,11 @@ use App\Http\Controllers\Auth\StaffAuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\InventoryController;
-use App\Http\Controllers\SaleController;
-use App\Http\Controllers\StaffController;
-use App\Http\Controllers\ReportController;
 use App\Http\Controllers\OthersController;
+use App\Http\Controllers\ReportController;
+use App\Http\Controllers\SaleController;
 use App\Http\Controllers\SettingsController;
+use App\Http\Controllers\StaffController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -24,7 +24,9 @@ Route::middleware(['auth:staff'])->group(function () {
 
     Route::get('/events', [EventController::class, 'index'])->name('events.index');
     Route::get('/events/calendar-pdf', [EventController::class, 'downloadCalendar'])->name('events.calendar-pdf');
+    Route::get('/events/report-pdf', [EventController::class, 'downloadReport'])->name('events.report-pdf');
     Route::get('/events/{event}', [EventController::class, 'show'])->name('events.show');
+    Route::get('/events/{event}/edit-data', [EventController::class, 'editData'])->name('events.edit-data');
     Route::post('/events', [EventController::class, 'store'])->name('events.store');
     Route::put('/events/{event}', [EventController::class, 'update'])->name('events.update');
     Route::delete('/events/{event}', [EventController::class, 'destroy'])->name('events.destroy');
