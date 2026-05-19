@@ -10,6 +10,12 @@
         <p class="text-slate-500">Seleccione un evento activo para comenzar a registrar consumos y ventas.</p>
     </div>
 
+    <div class="flex items-center gap-1 bg-slate-100 rounded-lg p-1 w-fit mx-auto">
+        <a href="{{ route('sales.index', ['filter' => 'today']) }}" class="px-4 py-2 rounded-md text-xs font-bold transition-all {{ $filter === 'today' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700' }}">Hoy</a>
+        <a href="{{ route('sales.index', ['filter' => 'upcoming']) }}" class="px-4 py-2 rounded-md text-xs font-bold transition-all {{ $filter === 'upcoming' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700' }}">Abiertos</a>
+        <a href="{{ route('sales.index', ['filter' => 'completed']) }}" class="px-4 py-2 rounded-md text-xs font-bold transition-all {{ $filter === 'completed' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700' }}">Finalizados</a>
+    </div>
+
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         @forelse($events as $event)
         <a href="{{ route('sales.show', $event->id) }}" class="group bg-white p-6 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md hover:border-brand-accent transition-all text-left flex items-center justify-between">

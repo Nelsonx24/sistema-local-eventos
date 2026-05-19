@@ -11,11 +11,22 @@ use Illuminate\Support\Facades\Auth;
 
 class SaleController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $events = Event::where('status', '!=', 'Cerrado')->orderBy('date')->get();
+        $query = Event::orderBy('date');
 
-        return view('sales.index', compact('events'));
+        $filter = $request->get('filter', 'today');
+        if ($filter === 'today') {
+            $query->whereDate('date', now()->toDateString());
+        } elseif ($filter === 'completed') {
+            $query->where('event_status', 'completed');
+        } else {
+            $query->where('event_status', 'upcoming');
+        }
+
+        $events = $query->get();
+
+        return view('sales.index', compact('events', 'filter'));
     }
 
     public function show(Event $event)
@@ -36,18 +47,19 @@ class SaleController extends Controller
 
     public function processSale(Request $request)
     {
+        $items = is_string($request->items) ? json_decode($request->items, true) : $request->items;
+
         $validated = $request->validate([
             'client_name' => 'required|string|max:255',
             'event_id' => 'nullable|string',
             'payment_method' => 'required|string',
             'cash_received' => 'numeric|min:0',
-            'items' => 'required|array|min:1',
-            'items.*.name' => 'required|string',
-            'items.*.quantity' => 'required|integer|min:1',
-            'items.*.type' => 'required|in:Caja,Unidad',
         ]);
 
-        $items = $validated['items'];
+        if (! $items || ! is_array($items) || count($items) < 1) {
+            return back()->withErrors(['items' => 'Debe agregar al menos un producto.']);
+        }
+
         $totalAmount = 0;
 
         foreach ($items as $item) {

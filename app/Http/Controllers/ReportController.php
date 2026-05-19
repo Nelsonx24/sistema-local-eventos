@@ -117,10 +117,10 @@ class ReportController extends Controller
 
     public function downloadPdf(Event $event)
     {
-        $sales = Sale::where('event_id', $event->id)->orderBy('id', 'desc')->get();
-        $totalAmount = $sales->sum('amount');
+        $events = collect([$event]);
+        $title = 'Reporte - '.$event->client_name;
 
-        $html = view('pdf.report', compact('event', 'sales', 'totalAmount'))->render();
+        $html = view('pdf.report', compact('events', 'title'))->render();
 
         $pdf = Pdf::loadHTML($html);
 

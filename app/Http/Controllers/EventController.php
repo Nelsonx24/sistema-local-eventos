@@ -97,13 +97,17 @@ class EventController extends Controller
     {
         $query = Event::orderBy('date');
 
+        $year = $request->filled('year') ? $request->year : now()->year;
+        $monthName = '';
+
         if ($request->filled('year') && ! $request->filled('month')) {
             $query->whereYear('date', $request->year);
         }
 
         if ($request->filled('month')) {
-            $year = $request->filled('year') ? $request->year : now()->year;
             $query->whereYear('date', $year)->whereMonth('date', $request->month);
+            $monthNames = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+            $monthName = $monthNames[(int) $request->month - 1] ?? '';
         }
 
         if ($request->filled('from')) {
@@ -118,7 +122,7 @@ class EventController extends Controller
 
         $title = match (true) {
             $request->filled('from') && $request->filled('to') => 'Reporte del '.date('d/m/Y', strtotime($request->from)).' al '.date('d/m/Y', strtotime($request->to)),
-            $request->filled('month') => 'Reporte - '.strtoupper(now()->month((int) $request->month)->translatedFormat('F')).' '.$year,
+            $request->filled('month') => 'Reporte - '.strtoupper($monthName).' '.$year,
             $request->filled('year') => 'Reporte - AÑO '.$request->year,
             default => 'Reporte de Eventos',
         };

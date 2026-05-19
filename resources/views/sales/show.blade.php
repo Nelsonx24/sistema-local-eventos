@@ -21,10 +21,12 @@
                 <p class="text-xs text-slate-500 italic">Terminal de ventas activo para este evento</p>
             </div>
         </div>
+        @if($event->event_status !== 'completed')
         <button onclick="openModal('sale-modal')" class="flex-1 md:flex-none bg-brand-accent text-white px-6 py-2 rounded-xl text-sm font-bold shadow-lg shadow-blue-200 hover:shadow-xl hover:bg-blue-600 transition-all flex items-center justify-center gap-2">
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
             Nueva Venta
         </button>
+        @endif
     </div>
 
     <!-- Sales History -->
@@ -240,6 +242,9 @@
 </div>
 
 <script>
+let currentType = 'Caja';
+let cart = [];
+
 function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
 function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
 
@@ -254,19 +259,26 @@ function showProductImage() {
     if (option.value) {
         const imageBox = option.dataset.imageBox;
         const imageUnit = option.dataset.imageUnit;
+        const showUnit = currentType === 'Unidad';
         
-        if (imageBox || imageUnit) {
-            const imageUrl = imageBox ? '/storage/' + imageBox : '/storage/' + imageUnit;
-            img.src = imageUrl;
+        if (showUnit && imageUnit) {
+            img.src = '/storage/' + imageUnit;
             img.style.display = 'block';
-            name.textContent = option.value;
-            type.textContent = 'Imagen referencial del producto';
-            imgDisplay.classList.remove('hidden');
-            imgDisplay.classList.add('flex');
+        } else if (imageBox) {
+            img.src = '/storage/' + imageBox;
+            img.style.display = 'block';
+        } else if (imageUnit) {
+            img.src = '/storage/' + imageUnit;
+            img.style.display = 'block';
         } else {
             imgDisplay.classList.add('hidden');
             imgDisplay.classList.remove('flex');
+            return;
         }
+        name.textContent = option.value;
+        type.textContent = showUnit ? 'Imagen por unidad' : 'Imagen por caja';
+        imgDisplay.classList.remove('hidden');
+        imgDisplay.classList.add('flex');
     } else {
         imgDisplay.classList.add('hidden');
         imgDisplay.classList.remove('flex');
@@ -287,11 +299,14 @@ function setSaleType(type) {
     currentType = type;
     document.getElementById('btn-type-Caja').className = type === 'Caja' ? 'flex-1 py-1.5 rounded-md text-xs font-bold bg-brand-accent text-white shadow-sm' : 'flex-1 py-1.5 rounded-md text-xs font-bold bg-white text-text-muted border border-border-subtle';
     document.getElementById('btn-type-Unidad').className = type === 'Unidad' ? 'flex-1 py-1.5 rounded-md text-xs font-bold bg-brand-accent text-white shadow-sm' : 'flex-1 py-1.5 rounded-md text-xs font-bold bg-white text-text-muted border border-border-subtle';
+    showProductImage();
 }
 
 document.getElementById('product-select').addEventListener('change', function() {
     document.getElementById('product-options').classList.toggle('hidden', !this.value);
 });
+
+setPaymentMethod('Efectivo');
 
 function addToCart() {
     const select = document.getElementById('product-select');
@@ -344,10 +359,15 @@ document.getElementById('sale-form').addEventListener('submit', function(e) {
         alert('Agregue productos al carrito');
         return;
     }
-    const input = document.createElement('input');
+    let input = document.createElement('input');
     input.type = 'hidden';
     input.name = 'items';
     input.value = JSON.stringify(cart);
+    this.appendChild(input);
+    input = document.createElement('input');
+    input.type = 'hidden';
+    input.name = 'cash_received';
+    input.value = document.getElementById('cash-received').value || '0';
     this.appendChild(input);
 });
 </script>

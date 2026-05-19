@@ -207,7 +207,7 @@
                             <span>Monto Recibido</span>
                             <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-emerald-500"><line x1="12" x2="12" y1="2" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
                         </label>
-                        <input type="number" name="cash_received" id="cash_received" class="w-full bg-transparent text-xl font-bold text-text-main outline-none" value="0" onchange="updateChange()">
+                        <input type="number" name="cash_received" id="cash_received" class="w-full bg-transparent text-xl font-bold text-text-main outline-none" value="0" oninput="updateChange()">
                     </div>
 
                     <div class="flex justify-between items-center p-3 bg-blue-50/50 rounded-xl border border-blue-100">
@@ -259,26 +259,44 @@ function showItemOptions() {
     
     if (selectedItem) {
         document.getElementById('item-options').classList.remove('hidden');
-        
-        const imageBox = option.dataset.imageBox;
-        const imageUnit = option.dataset.imageUnit;
-        
-        if (imageBox || imageUnit) {
-            const imageUrl = imageBox ? '/storage/' + imageBox : '/storage/' + imageUnit;
-            img.src = imageUrl;
-            img.style.display = 'block';
-            name.textContent = selectedItem;
-            imgDisplay.classList.remove('hidden');
-            imgDisplay.classList.add('flex');
-        } else {
-            imgDisplay.classList.add('hidden');
-            imgDisplay.classList.remove('flex');
-        }
+        updateDirectImage();
     } else {
         document.getElementById('item-options').classList.add('hidden');
         imgDisplay.classList.add('hidden');
         imgDisplay.classList.remove('flex');
     }
+}
+
+function updateDirectImage() {
+    const select = document.getElementById('select-item');
+    const option = select.options[select.selectedIndex];
+    const imgDisplay = document.getElementById('direct-product-image');
+    const img = document.getElementById('direct-selected-img');
+    const name = document.getElementById('direct-product-name');
+    
+    if (!selectedItem) return;
+    
+    const imageBox = option.dataset.imageBox;
+    const imageUnit = option.dataset.imageUnit;
+    const showUnit = selectedType === 'Unidad';
+    
+    if (showUnit && imageUnit) {
+        img.src = '/storage/' + imageUnit;
+        img.style.display = 'block';
+    } else if (imageBox) {
+        img.src = '/storage/' + imageBox;
+        img.style.display = 'block';
+    } else if (imageUnit) {
+        img.src = '/storage/' + imageUnit;
+        img.style.display = 'block';
+    } else {
+        imgDisplay.classList.add('hidden');
+        imgDisplay.classList.remove('flex');
+        return;
+    }
+    name.textContent = selectedItem;
+    imgDisplay.classList.remove('hidden');
+    imgDisplay.classList.add('flex');
 }
 
 function setItemType(type) {
@@ -290,6 +308,7 @@ function setItemType(type) {
             btn.className = 'type-btn flex-1 py-1.5 rounded-md text-xs font-bold transition-all bg-white text-text-muted border border-border-subtle';
         }
     });
+    updateDirectImage();
 }
 
 function addToCart() {
@@ -304,8 +323,10 @@ function addToCart() {
     renderCart();
     
     document.getElementById('select-item').value = '';
-    document.getElementById('item-options').classList.add('hidden');
     document.getElementById('item-qty').value = 1;
+    selectedItem = '';
+    document.getElementById('direct-product-image').classList.add('hidden');
+    document.getElementById('direct-product-image').classList.remove('flex');
 }
 
 function renderCart() {
@@ -313,8 +334,8 @@ function renderCart() {
     const emptyCart = document.getElementById('empty-cart');
     
     if (cart.length === 0) {
-        emptyCart.classList.remove('hidden');
         container.innerHTML = '';
+        emptyCart.classList.remove('hidden');
         container.appendChild(emptyCart);
     } else {
         emptyCart.classList.add('hidden');
@@ -336,6 +357,8 @@ function renderCart() {
             `;
         });
         container.innerHTML = html;
+        container.appendChild(emptyCart);
+        emptyCart.classList.add('hidden');
     }
     updateTotal();
 }
@@ -349,15 +372,14 @@ function updateTotal() {
     const total = cart.reduce((acc, curr) => acc + curr.subtotal, 0);
     document.getElementById('total-display').textContent = total.toLocaleString() + ' Bs';
     
-    const method = document.getElementById('payment_method').value;
-    if (method !== 'Efectivo') {
-        document.getElementById('cash_received').value = total;
-    }
+    document.getElementById('cash_received').value = total;
     
-    updateChange();
+    const cash = parseFloat(document.getElementById('cash_received').value) || 0;
+    const change = cash > total ? cash - total : 0;
+    document.getElementById('change-display').textContent = change.toLocaleString() + ' Bs';
     
     const submitBtn = document.getElementById('submit-btn');
-    const cash = parseFloat(document.getElementById('cash_received').value) || 0;
+    const method = document.getElementById('payment_method').value;
     submitBtn.disabled = cart.length === 0 || (method === 'Efectivo' && cash < total);
 }
 
@@ -373,7 +395,7 @@ function submitSale() {
     if (cart.length === 0) return;
     
     const method = document.getElementById('payment_method').value;
-    const cash = method === 'Efectivo' ? parseFloat(document.getElementById('cash_received').value) : 0;
+    const cash = method === 'Efectivo' ? parseFloat(document.getElementById('cash_received').value) : cart.reduce((acc, curr) => acc + curr.subtotal, 0);
     
     let form = document.getElementById('sale-form');
     let itemsInput = document.createElement('input');
@@ -382,13 +404,11 @@ function submitSale() {
     itemsInput.value = JSON.stringify(cart);
     form.appendChild(itemsInput);
     
-    if (method === 'Efectivo') {
-        let cashInput = document.createElement('input');
-        cashInput.type = 'hidden';
-        cashInput.name = 'cash_received';
-        cashInput.value = cash;
-        form.appendChild(cashInput);
-    }
+    let cashInput = document.createElement('input');
+    cashInput.type = 'hidden';
+    cashInput.name = 'cash_received';
+    cashInput.value = cash;
+    form.appendChild(cashInput);
     
     form.submit();
 }
