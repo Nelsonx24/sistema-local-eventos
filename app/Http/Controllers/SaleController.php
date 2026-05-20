@@ -32,7 +32,7 @@ class SaleController extends Controller
 
     public function show(Event $event)
     {
-        $sales = Sale::where('event_id', $event->id)->orderBy('id', 'desc')->get();
+        $sales = Sale::where('event_id', $event->id)->orderBy('id', 'desc')->paginate(5);
         $inventory = Inventory::all();
         $clientNames = Sale::distinct()->pluck('client_name')->merge(
             Event::distinct()->pluck('client_name')

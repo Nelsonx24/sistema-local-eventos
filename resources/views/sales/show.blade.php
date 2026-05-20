@@ -46,7 +46,8 @@
                 <table class="w-full border-collapse text-left">
                     <thead class="sticky top-0 z-10 bg-[#f8fafc] border-b border-border-subtle shadow-sm">
                         <tr>
-                            <th class="px-6 py-3 text-[0.7rem] font-bold text-text-muted uppercase tracking-widest text-center w-24">ID</th>
+                            <th class="px-6 py-3 text-[0.7rem] font-bold text-text-muted uppercase tracking-widest text-center">ID</th>
+                            <th class="px-6 py-3 text-[0.7rem] font-bold text-text-muted uppercase tracking-widest text-center">Hora</th>
                             <th class="px-6 py-3 text-[0.7rem] font-bold text-text-muted uppercase tracking-widest">Comprador</th>
                             <th class="px-6 py-3 text-[0.7rem] font-bold text-text-muted uppercase tracking-widest text-center">Vendedor</th>
                             <th class="px-6 py-3 text-[0.7rem] font-bold text-text-muted uppercase tracking-widest">Detalle de Compra</th>
@@ -59,7 +60,9 @@
                         <tr class="hover:bg-slate-50 transition-colors">
                             <td class="px-6 py-4 text-center">
                                 <span class="text-[0.75rem] font-mono font-bold text-brand-accent">#{{ $sale->id }}</span>
-                                <p class="text-[0.6rem] text-slate-400">{{ $sale->date }}</p>
+                            </td>
+                            <td class="px-6 py-4 text-center">
+                                <span class="text-[0.7rem] text-slate-500">{{ $sale->created_at->format('H:i') }}</span>
                             </td>
                             <td class="px-6 py-4">
                                 <p class="text-sm font-bold text-slate-800 leading-none">{{ $sale->client_name }}</p>
@@ -99,7 +102,7 @@
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="6" class="px-6 py-16 text-center text-slate-400">
+                            <td colspan="7" class="px-6 py-16 text-center text-slate-400">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="mx-auto mb-4 opacity-10"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>
                                 <p class="text-sm font-medium">Aún no se han registrado ventas para este evento.</p>
                             </td>
@@ -108,6 +111,9 @@
                     </tbody>
                 </table>
             </div>
+        </div>
+        <div class="px-6 py-3 border-t border-border-subtle">
+            {{ $sales->links() }}
         </div>
     </div>
 

@@ -11,14 +11,14 @@ class ReportController extends Controller
 {
     public function index()
     {
-        $events = Event::orderBy('date', 'desc')->get();
-        $closedEvents = $events->where('event_status', 'completed');
+        $allClosedEvents = Event::where('event_status', 'completed')->orderBy('date', 'desc')->get();
+        $closedEvents = Event::where('event_status', 'completed')->orderBy('date', 'desc')->paginate(5);
 
         $totalSales = 0;
         $totalEfectivo = 0;
         $totalQR = 0;
         $totalTarjeta = 0;
-        foreach ($closedEvents as $event) {
+        foreach ($allClosedEvents as $event) {
             $sales = Sale::where('event_id', $event->id)->get();
             $totalSales += $sales->sum('amount');
             $totalEfectivo += $sales->where('payment_method', 'Efectivo')->sum('amount');
@@ -26,7 +26,7 @@ class ReportController extends Controller
             $totalTarjeta += $sales->where('payment_method', 'Tarjeta')->sum('amount');
         }
 
-        $lastEvent = $closedEvents->sortByDesc('updated_at')->first();
+        $lastEvent = $allClosedEvents->sortByDesc('updated_at')->first();
         $lastEventSales = collect();
         $lastEventSalesCount = 0;
         $lastEventBiggestSale = 0;
@@ -96,7 +96,7 @@ class ReportController extends Controller
             ]);
 
         return view('reports.index', compact(
-            'events', 'closedEvents', 'totalSales', 'totalEfectivo', 'totalQR', 'totalTarjeta',
+            'closedEvents', 'totalSales', 'totalEfectivo', 'totalQR', 'totalTarjeta',
             'lastEvent', 'lastEventSales', 'lastEventSalesCount', 'lastEventBiggestSale', 'lastEventBiggestSaleClient',
             'lastEventEfectivo', 'lastEventQR', 'lastEventTarjeta', 'productPercentages',
             'totalBoxes', 'totalUnits', 'productDetails',

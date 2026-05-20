@@ -194,6 +194,11 @@
             </table>
         </div>
         </div>
+        @if($closedEvents->hasPages())
+        <div class="mt-4">
+            {{ $closedEvents->links() }}
+        </div>
+        @endif
     </div>
 
     <div x-show="tab === 'directas'">
