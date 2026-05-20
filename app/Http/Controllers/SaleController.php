@@ -33,16 +33,22 @@ class SaleController extends Controller
     {
         $sales = Sale::where('event_id', $event->id)->orderBy('id', 'desc')->get();
         $inventory = Inventory::all();
+        $clientNames = Sale::distinct()->pluck('client_name')->merge(
+            Event::distinct()->pluck('client_name')
+        )->unique()->sort()->values();
 
-        return view('sales.show', compact('event', 'sales', 'inventory'));
+        return view('sales.show', compact('event', 'sales', 'inventory', 'clientNames'));
     }
 
     public function directSale()
     {
         $inventory = Inventory::all();
         $sales = Sale::where('event_id', 'Venta Directa')->orderBy('id', 'desc')->get();
+        $clientNames = Sale::distinct()->pluck('client_name')->merge(
+            Event::distinct()->pluck('client_name')
+        )->unique()->sort()->values();
 
-        return view('sales.direct', compact('inventory', 'sales'));
+        return view('sales.direct', compact('inventory', 'sales', 'clientNames'));
     }
 
     public function processSale(Request $request)

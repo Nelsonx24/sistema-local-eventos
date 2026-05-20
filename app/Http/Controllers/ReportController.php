@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Event;
 use App\Models\Sale;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\Carbon;
 
 class ReportController extends Controller
 {
@@ -86,12 +87,21 @@ class ReportController extends Controller
         $directSalesQR = $directSales->where('payment_method', 'QR')->sum('amount');
         $directSalesTarjeta = $directSales->where('payment_method', 'Tarjeta')->sum('amount');
 
+        $directSalesByDate = $directSales->groupBy(fn ($s) => $s->created_at->format('Y-m-d'))
+            ->sortKeysDesc()
+            ->map(fn ($group) => [
+                'sales' => $group,
+                'count' => $group->count(),
+                'total' => $group->sum('amount'),
+            ]);
+
         return view('reports.index', compact(
             'events', 'closedEvents', 'totalSales', 'totalEfectivo', 'totalQR', 'totalTarjeta',
             'lastEvent', 'lastEventSales', 'lastEventSalesCount', 'lastEventBiggestSale', 'lastEventBiggestSaleClient',
             'lastEventEfectivo', 'lastEventQR', 'lastEventTarjeta', 'productPercentages',
             'totalBoxes', 'totalUnits', 'productDetails',
-            'directSales', 'directSalesTotal', 'directSalesEfectivo', 'directSalesQR', 'directSalesTarjeta'
+            'directSales', 'directSalesTotal', 'directSalesEfectivo', 'directSalesQR', 'directSalesTarjeta',
+            'directSalesByDate'
         ));
     }
 
@@ -125,5 +135,44 @@ class ReportController extends Controller
         $pdf = Pdf::loadHTML($html);
 
         return $pdf->download("Reporte_{$event->client_name}.pdf");
+    }
+
+    public function directSales(string $date)
+    {
+        $sales = Sale::where('event_id', 'like', 'Venta Directa%')
+            ->whereDate('created_at', $date)
+            ->with('items')
+            ->latest()
+            ->get();
+
+        $total = $sales->sum('amount');
+        $efectivo = $sales->where('payment_method', 'Efectivo')->sum('amount');
+        $qr = $sales->where('payment_method', 'QR')->sum('amount');
+        $tarjeta = $sales->where('payment_method', 'Tarjeta')->sum('amount');
+
+        $displayDate = Carbon::parse($date)->format('d/m/Y');
+
+        return view('reports.direct', compact('sales', 'total', 'efectivo', 'qr', 'tarjeta', 'displayDate', 'date'));
+    }
+
+    public function directSalesPdf(string $date)
+    {
+        $sales = Sale::where('event_id', 'like', 'Venta Directa%')
+            ->whereDate('created_at', $date)
+            ->with('items')
+            ->latest()
+            ->get();
+
+        $total = $sales->sum('amount');
+        $efectivo = $sales->where('payment_method', 'Efectivo')->sum('amount');
+        $qr = $sales->where('payment_method', 'QR')->sum('amount');
+        $tarjeta = $sales->where('payment_method', 'Tarjeta')->sum('amount');
+        $displayDate = Carbon::parse($date)->format('d/m/Y');
+
+        $html = view('pdf.direct-sales', compact('sales', 'total', 'efectivo', 'qr', 'tarjeta', 'displayDate', 'date'))->render();
+
+        $pdf = Pdf::loadHTML($html);
+
+        return $pdf->download("Ventas_Directas_{$date}.pdf");
     }
 }

@@ -44,6 +44,11 @@ class Event extends Model
         ];
     }
 
+    public function getClientNameAttribute(?string $value): ?string
+    {
+        return $value !== null ? mb_strtoupper($value) : null;
+    }
+
     public function sales(): HasMany
     {
         return $this->hasMany(Sale::class, 'event_id', 'id');

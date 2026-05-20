@@ -4,43 +4,7 @@
 @section('header-title', 'Reportes')
 
 @section('content')
-@if(Auth::guard('staff')->user()->role === 'Administrador')
-<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-        <div class="flex items-center gap-3 mb-4">
-            <div class="p-2 bg-blue-50 text-blue-600 rounded-lg">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-            </div>
-            <h3 class="text-xs font-bold text-slate-500 uppercase tracking-widest">Ingresos Totales</h3>
-        </div>
-        <p class="text-3xl font-extrabold text-slate-900">{{ number_format($totalSales) }} Bs</p>
-    </div>
-    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-        <div class="flex items-center gap-3 mb-4">
-            <div class="p-2 bg-purple-50 text-purple-600 rounded-lg">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
-            </div>
-            <h3 class="text-xs font-bold text-slate-500 uppercase tracking-widest">Eventos Cerrados</h3>
-        </div>
-        <p class="text-3xl font-extrabold text-slate-900">{{ $closedEvents->count() }}</p>
-    </div>
-    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-        <div class="flex items-center gap-3 mb-4">
-            <div class="p-2 bg-emerald-50 text-emerald-600 rounded-lg">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" x2="8" y1="13" y2="13"/><line x1="16" x2="8" y1="17" y2="17"/></svg>
-            </div>
-            <h3 class="text-xs font-bold text-slate-500 uppercase tracking-widest">Promedio por Evento</h3>
-        </div>
-        <p class="text-3xl font-extrabold text-slate-900">{{ $closedEvents->count() > 0 ? number_format($totalSales / $closedEvents->count()) : 0 }} Bs</p>
-    </div>
-</div>
 
-<div class="flex items-center gap-2 mb-4">
-    <span class="px-3 py-1 bg-emerald-50 text-emerald-700 rounded-full text-[0.65rem] font-bold border border-emerald-200">Efectivo: {{ number_format($totalEfectivo) }} Bs</span>
-    <span class="px-3 py-1 bg-indigo-50 text-indigo-700 rounded-full text-[0.65rem] font-bold border border-indigo-200">QR: {{ number_format($totalQR) }} Bs</span>
-    <span class="px-3 py-1 bg-slate-100 text-slate-700 rounded-full text-[0.65rem] font-bold border border-slate-200">Tarjeta: {{ number_format($totalTarjeta) }} Bs</span>
-</div>
-@endif
 
 @if($lastEvent)
 <div class="flex flex-wrap gap-4 mb-6">
@@ -117,44 +81,43 @@
             @endforelse
         </div>
     </div>
-</div>
-
-<div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm mb-6">
-    <div class="flex items-center gap-2 mb-4">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-brand-accent"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-        <h3 class="text-sm font-bold text-slate-700 uppercase tracking-widest">Distribución de Productos</h3>
-    </div>
-    @if(count($productPercentages) > 0)
-    @php
-        $colors = ['#f97316', '#3b82f6', '#10b981', '#8b5cf6', '#ec4899', '#14b8a6', '#f59e0b', '#ef4444'];
-        $conic = '';
-        $angle = 0;
-        $legend = [];
-        foreach ($productPercentages as $i => $p) {
-            $deg = round(($p['percentage'] / 100) * 360);
-            if ($deg > 0) {
-                $end = $angle + $deg;
-                $conic .= ($i > 0 ? ', ' : '') . $colors[$i % count($colors)] . ' ' . $angle . 'deg ' . $end . 'deg';
-                $legend[] = ['name' => $p['name'], 'count' => $p['count'], 'pct' => $p['percentage'], 'color' => $colors[$i % count($colors)]];
-                $angle = $end;
-            }
-        }
-    @endphp
-    <div class="flex items-center gap-4">
-        <div class="w-24 h-24 rounded-full shrink-0" style="background: conic-gradient({{ $conic }})"></div>
-        <div class="flex flex-col gap-1">
-            @foreach($legend as $l)
-            <div class="flex items-center gap-2 text-xs">
-                <span class="w-2.5 h-2.5 rounded-sm shrink-0" style="background: {{ $l['color'] }}"></span>
-                <span class="font-medium text-slate-700">{{ $l['name'] }}</span>
-                <span class="text-slate-400">{{ $l['pct'] }}%</span>
-            </div>
-            @endforeach
+    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+        <div class="flex items-center gap-2 mb-4">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-brand-accent"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            <h3 class="text-sm font-bold text-slate-700 uppercase tracking-widest">Distribución de Productos</h3>
         </div>
+        @if(count($productPercentages) > 0)
+        @php
+            $colors = ['#f97316', '#3b82f6', '#10b981', '#8b5cf6', '#ec4899', '#14b8a6', '#f59e0b', '#ef4444'];
+            $conic = '';
+            $angle = 0;
+            $legend = [];
+            foreach ($productPercentages as $i => $p) {
+                $deg = round(($p['percentage'] / 100) * 360);
+                if ($deg > 0) {
+                    $end = $angle + $deg;
+                    $conic .= ($i > 0 ? ', ' : '') . $colors[$i % count($colors)] . ' ' . $angle . 'deg ' . $end . 'deg';
+                    $legend[] = ['name' => $p['name'], 'count' => $p['count'], 'pct' => $p['percentage'], 'color' => $colors[$i % count($colors)]];
+                    $angle = $end;
+                }
+            }
+        @endphp
+        <div class="flex items-start gap-4 flex-wrap">
+            <div class="w-20 h-20 rounded-full shrink-0" style="background: conic-gradient({{ $conic }})"></div>
+            <div class="flex flex-col gap-1">
+                @foreach($legend as $l)
+                <div class="flex items-center gap-2 text-xs">
+                    <span class="w-2.5 h-2.5 rounded-sm shrink-0" style="background: {{ $l['color'] }}"></span>
+                    <span class="font-medium text-slate-700">{{ $l['name'] }}</span>
+                    <span class="text-slate-400">{{ $l['pct'] }}%</span>
+                </div>
+                @endforeach
+            </div>
+        </div>
+        @else
+        <p class="text-sm text-slate-400 italic">Sin ventas en este evento.</p>
+        @endif
     </div>
-    @else
-    <p class="text-sm text-slate-400 italic">Sin ventas en este evento.</p>
-    @endif
 </div>
 @endif
 
@@ -239,39 +202,46 @@
                 <table class="w-full border-collapse text-left">
                     <thead class="bg-[#f8fafc] border-b border-slate-200">
                         <tr>
-                            <th class="px-6 py-4 text-[0.7rem] font-bold text-slate-400 uppercase tracking-widest">#</th>
-                            <th class="px-6 py-4 text-[0.7rem] font-bold text-slate-400 uppercase tracking-widest">Cliente</th>
-                            <th class="px-6 py-4 text-[0.7rem] font-bold text-slate-400 uppercase tracking-widest text-center">Método</th>
-                            <th class="px-6 py-4 text-[0.7rem] font-bold text-slate-400 uppercase tracking-widest text-center">Items</th>
-                            <th class="px-6 py-4 text-[0.7rem] font-bold text-slate-400 uppercase tracking-widest text-right">Monto</th>
-                            <th class="px-6 py-4 text-[0.7rem] font-bold text-slate-400 uppercase tracking-widest text-center">Fecha</th>
+                            <th class="px-6 py-4 text-[0.7rem] font-bold text-slate-400 uppercase tracking-widest">Fecha</th>
+                            <th class="px-6 py-4 text-[0.7rem] font-bold text-slate-400 uppercase tracking-widest text-center">Ventas</th>
+                            <th class="px-6 py-4 text-[0.7rem] font-bold text-slate-400 uppercase tracking-widest text-right">Total</th>
+                            <th class="px-6 py-4 text-[0.7rem] font-bold text-slate-400 uppercase tracking-widest text-center"></th>
                         </tr>
                     </thead>
+                    @forelse($directSalesByDate as $dateKey => $group)
+                    @php $displayDate = \Carbon\Carbon::parse($dateKey)->format('d/m/Y'); @endphp
                     <tbody class="divide-y divide-slate-100">
-                        @forelse($directSales as $sale)
-                        <tr class="hover:bg-slate-50 transition-colors">
-                            <td class="px-6 py-4 text-xs font-bold text-slate-400">#{{ $sale->id }}</td>
+                        <tr class="hover:bg-slate-50 transition-colors cursor-pointer" onclick="window.location='{{ route('reports.direct', $dateKey) }}'">
                             <td class="px-6 py-4">
-                                <span class="font-bold text-slate-900 text-sm">{{ $sale->client_name }}</span>
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 bg-slate-100 text-slate-500 rounded-xl flex items-center justify-center font-bold text-xs">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
+                                    </div>
+                                    <span class="font-bold text-slate-900">{{ $displayDate }}</span>
+                                </div>
                             </td>
                             <td class="px-6 py-4 text-center">
-                                @php
-                                    $methodColors = ['Efectivo' => 'bg-emerald-50 text-emerald-700 border-emerald-200', 'QR' => 'bg-indigo-50 text-indigo-700 border-indigo-200', 'Tarjeta' => 'bg-slate-100 text-slate-700 border-slate-200'];
-                                @endphp
-                                <span class="px-2.5 py-0.5 rounded-full text-[0.6rem] font-bold border {{ $methodColors[$sale->payment_method] ?? 'bg-slate-50 text-slate-600 border-slate-200' }}">
-                                    {{ $sale->payment_method }}
+                                <span class="px-3 py-1 bg-blue-50 text-blue-600 text-[0.65rem] font-bold rounded-full border border-blue-100">
+                                    {{ $group['count'] }} factura(s)
                                 </span>
                             </td>
-                            <td class="px-6 py-4 text-center text-xs font-medium text-slate-600">{{ $sale->items->count() }} producto(s)</td>
-                            <td class="px-6 py-4 text-right text-sm font-extrabold text-slate-900">{{ number_format($sale->amount) }} Bs</td>
-                            <td class="px-6 py-4 text-center text-xs text-slate-500">{{ $sale->created_at->format('d/m/Y') }}</td>
+                            <td class="px-6 py-4 text-right">
+                                <p class="text-sm font-extrabold text-slate-900">{{ number_format($group['total']) }} Bs</p>
+                            </td>
+                            <td class="px-6 py-4 text-center">
+                                <a href="{{ route('reports.direct', $dateKey) }}" class="w-8 h-8 rounded-full flex items-center justify-center text-slate-300 hover:text-brand-accent hover:bg-blue-50 transition-all">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
+                                </a>
+                            </td>
                         </tr>
-                        @empty
-                        <tr>
-                            <td colspan="6" class="px-6 py-12 text-center text-slate-400 italic">No hay ventas directas registradas.</td>
-                        </tr>
-                        @endforelse
                     </tbody>
+                    @empty
+                    <tbody>
+                        <tr>
+                            <td colspan="4" class="px-6 py-12 text-center text-slate-400 italic">No hay ventas directas registradas.</td>
+                        </tr>
+                    </tbody>
+                    @endforelse
                 </table>
             </div>
         </div>

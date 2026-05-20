@@ -47,6 +47,11 @@ class Sale extends Model
         return $this->hasMany(SaleItem::class);
     }
 
+    public function getClientNameAttribute(?string $value): ?string
+    {
+        return $value !== null ? mb_strtoupper($value) : null;
+    }
+
     public function getTotalAmountAttribute(): float
     {
         return $this->items->sum('subtotal');

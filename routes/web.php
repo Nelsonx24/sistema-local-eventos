@@ -59,6 +59,8 @@ Route::middleware(['auth:staff'])->group(function () {
     Route::delete('/staff/{staff}', [StaffController::class, 'destroy'])->name('staff.destroy');
 
     Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
+    Route::get('/reports/direct/{date}', [ReportController::class, 'directSales'])->name('reports.direct');
+    Route::get('/reports/direct/{date}/pdf', [ReportController::class, 'directSalesPdf'])->name('reports.direct.pdf');
     Route::get('/reports/{event}', [ReportController::class, 'show'])->name('reports.show');
     Route::get('/reports/{event}/pdf', [ReportController::class, 'downloadPdf'])->name('reports.pdf');
     Route::delete('/reports/{event}', [ReportController::class, 'destroy'])->name('reports.destroy');

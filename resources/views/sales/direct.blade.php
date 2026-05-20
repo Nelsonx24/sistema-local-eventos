@@ -111,8 +111,8 @@
 
 <!-- Sale Modal -->
 <div id="sale-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm hidden">
-    <div class="bg-white rounded-xl shadow-2xl w-full max-w-2xl overflow-hidden border border-border-subtle flex flex-col md:flex-row h-[600px]">
-        <div class="w-full md:w-1/2 p-6 border-r border-border-subtle flex flex-col gap-4 overflow-y-auto">
+    <div class="bg-white rounded-xl shadow-2xl w-full max-w-3xl overflow-hidden border border-border-subtle flex flex-col md:flex-row h-[630px]">
+        <div class="w-full md:w-1/2 p-6 border-r border-border-subtle flex flex-col gap-4">
             <div class="flex flex-col gap-1 mb-2">
                 <h3 class="font-bold text-text-main flex items-center gap-2">
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-brand-accent"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
@@ -129,8 +129,16 @@
                 
                 <div class="flex flex-col gap-3">
                     <div class="flex flex-col gap-1">
-                        <label class="text-[0.65rem] font-bold text-text-muted uppercase tracking-widest">Nombre del Comprador</label>
-                        <input type="text" name="client_name" placeholder="Nombre..." required class="px-3 py-2 bg-slate-50 border border-border-subtle rounded-lg text-sm outline-none focus:ring-1 focus:ring-brand-accent/30">
+                        <div class="flex items-center justify-between">
+                            <label class="text-[0.65rem] font-bold text-text-muted uppercase tracking-widest">Nombre del Comprador</label>
+                            <button type="button" onclick="document.querySelector('input[name=client_name]').value='Sin Nombre'" class="text-[0.65rem] font-bold text-brand-accent uppercase tracking-widest hover:text-blue-700 transition-colors">S/N</button>
+                        </div>
+                        <input type="text" name="client_name" value="Sin Nombre" placeholder="Nombre..." autocomplete="off" required class="px-3 py-2 bg-slate-50 border border-border-subtle rounded-lg text-sm outline-none focus:ring-1 focus:ring-brand-accent/30" oninput="(this.value.includes(' ') && this.value.split(' ').pop().length >= 2) ? this.setAttribute('list', 'client-suggestions') : this.removeAttribute('list')">
+                        <datalist id="client-suggestions">
+                            @foreach($clientNames as $name)
+                            <option value="{{ $name }}">
+                            @endforeach
+                        </datalist>
                     </div>
 
                     <div class="flex flex-col gap-1">
@@ -175,6 +183,11 @@
                         <button type="button" onclick="addToCart()" class="mt-4 bg-slate-800 text-white p-2 rounded-md hover:bg-slate-700">
                             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
                         </button>
+                    </div>
+                    <div class="grid grid-cols-5 gap-1">
+                        @foreach(range(1, 10) as $n)
+                        <button type="button" onclick="document.getElementById('item-qty').value={{ $n }}; addToCart()" class="w-full aspect-square bg-white border border-border-subtle rounded-md text-xs font-bold text-slate-700 hover:bg-brand-accent hover:text-white transition-all">{{ $n }}</button>
+                        @endforeach
                     </div>
                 </div>
             </form>
