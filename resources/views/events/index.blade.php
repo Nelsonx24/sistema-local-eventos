@@ -426,7 +426,7 @@ function renderCalendar() {
         
         dayEvents.forEach(e => {
             const color = typeColors[e.type] || 'bg-slate-500';
-            html += `<button onclick="viewEvent(${e.id})" class="w-full text-left p-1.5 rounded-lg text-xs font-medium text-white truncate transition-transform hover:scale-[1.02] ${color}">${e.title.length > 15 ? e.title.substring(0, 15) + '...' : e.title}</button>`;
+            html += `<button onclick="viewEvent(${e.id})" class="w-full text-left p-1 rounded-lg text-white ${color}"><span class="text-[10px] font-bold leading-tight block truncate">${e.title.length > 12 ? e.title.substring(0, 12) + '...' : e.title}</span><span class="text-[10px] opacity-80 leading-tight block truncate">${e.type}</span></button>`;
         });
         
         html += `</div></div>`;

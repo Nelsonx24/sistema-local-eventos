@@ -51,6 +51,7 @@ class DashboardController extends Controller
 
             $data[] = [
                 'name' => $event->client_name,
+                'type' => $event->event_type,
                 'value' => $cajas,
             ];
         }

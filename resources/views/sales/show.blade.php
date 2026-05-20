@@ -171,12 +171,10 @@ setTimeout(() => {
                             <label class="text-[0.65rem] font-bold text-text-muted uppercase">Nombre del Comprador</label>
                             <button type="button" onclick="document.querySelector('input[name=client_name]').value='Sin Nombre'" class="text-[0.65rem] font-bold text-brand-accent uppercase tracking-widest hover:text-blue-700 transition-colors">S/N</button>
                         </div>
-                        <input type="text" name="client_name" value="{{ old('client_name') }}" placeholder="Nombre..." autocomplete="off" required class="px-3 py-2 bg-slate-50 border border-border-subtle rounded-lg text-sm outline-none uppercase" oninput="this.value = this.value.toUpperCase(); (this.value.includes(' ') && this.value.split(' ').pop().length >= 2) ? this.setAttribute('list', 'client-suggestions') : this.removeAttribute('list')">
-                        <datalist id="client-suggestions">
-                            @foreach($clientNames as $name)
-                            <option value="{{ $name }}">
-                            @endforeach
-                        </datalist>
+                        <div class="relative">
+                            <input type="text" name="client_name" id="client-name-input" value="{{ old('client_name') }}" placeholder="Nombre..." autocomplete="off" required class="w-full px-3 py-2 bg-slate-50 border border-border-subtle rounded-lg text-sm outline-none uppercase" oninput="this.value = this.value.toUpperCase(); suggestClients(this)">
+                            <div id="client-suggestions" class="absolute z-50 mt-1 w-full bg-white border border-border-subtle rounded-lg shadow-lg max-h-48 overflow-y-auto hidden"></div>
+                        </div>
                     </div>
 
                     <div class="flex flex-col gap-1">
@@ -275,6 +273,36 @@ setTimeout(() => {
 <script>
 let currentType = 'Caja';
 let cart = [];
+
+const clientNames = @json($clientNames);
+
+function suggestClients(input) {
+    const container = document.getElementById('client-suggestions');
+    const val = input.value.trim();
+    if (val.length < 2) { container.classList.add('hidden'); return; }
+    const filtered = clientNames.filter(n => n.includes(val));
+    if (filtered.length === 0) { container.classList.add('hidden'); return; }
+    container.innerHTML = filtered.map(n =>
+        `<div class="px-3 py-2 text-sm font-medium text-slate-700 hover:bg-brand-accent/10 hover:text-brand-accent cursor-pointer transition-colors uppercase" data-name="${n.replace(/"/g, '&quot;')}">${n}</div>`
+    ).join('');
+    container.classList.remove('hidden');
+}
+
+document.getElementById('client-suggestions').addEventListener('click', function(e) {
+    const item = e.target.closest('[data-name]');
+    if (item) {
+        document.getElementById('client-name-input').value = item.dataset.name;
+        this.classList.add('hidden');
+    }
+});
+
+document.addEventListener('click', function(e) {
+    const container = document.getElementById('client-suggestions');
+    const input = document.getElementById('client-name-input');
+    if (!container.contains(e.target) && e.target !== input) {
+        container.classList.add('hidden');
+    }
+});
 
 function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
 function closeModal(id) { document.getElementById(id).classList.add('hidden'); }

@@ -31,7 +31,7 @@
                     @foreach($chartDataPacena as $data)
                     <div class="flex flex-col items-center gap-2 max-w-[60px]">
                         <div class="w-full bg-red-600 rounded-t" style="height: {{ $data['value'] > 0 ? ($data['value'] / $maxPacena * 200) : 4 }}px; min-height: 4px;"></div>
-                        <span class="text-[0.7rem] text-text-muted">{{ $data['name'] }}</span>
+                        <span class="text-[0.7rem] text-text-muted text-center leading-tight">{{ $data['name'] }} <span class="text-[0.55rem] text-slate-400 block">{{ $data['type'] }}</span></span>
                         <span class="text-[0.65rem] font-bold text-text-muted">{{ $data['value'] }} cajas</span>
                     </div>
                     @endforeach
@@ -49,7 +49,7 @@
                     @foreach($chartDataHuari as $data)
                     <div class="flex flex-col items-center gap-2 max-w-[60px]">
                         <div class="w-full bg-black rounded-t" style="height: {{ $data['value'] > 0 ? ($data['value'] / $maxHuari * 200) : 4 }}px; min-height: 4px;"></div>
-                        <span class="text-[0.7rem] text-text-muted">{{ $data['name'] }}</span>
+                        <span class="text-[0.7rem] text-text-muted text-center leading-tight">{{ $data['name'] }} <span class="text-[0.55rem] text-slate-400 block">{{ $data['type'] }}</span></span>
                         <span class="text-[0.65rem] font-bold text-text-muted">{{ $data['value'] }} cajas</span>
                     </div>
                     @endforeach

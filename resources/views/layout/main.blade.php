@@ -30,7 +30,7 @@
 <body class="bg-surface-base text-text-main font-sans min-h-screen">
     <div class="flex min-h-screen">
         <!-- Sidebar -->
-        <aside class="w-[240px] bg-[#0f172a] flex flex-col fixed left-0 top-0 h-screen border-r border-[#1e293b]">
+        <aside id="sidebar" class="w-[240px] bg-[#0f172a] flex flex-col fixed left-0 top-0 h-screen border-r border-[#1e293b] transition-transform duration-300 z-20">
             <div class="p-6 h-16 flex items-center gap-3 border-b border-[#1e293b]">
                 <div class="w-6 h-6 bg-brand-accent rounded"></div>
                 <h1 class="text-lg font-bold tracking-tight text-[#f8fafc]">Gran Cañaveral</h1>
@@ -87,10 +87,13 @@
         </aside>
 
         <!-- Main Content -->
-        <main class="flex-1 ml-64 min-w-0">
+        <main id="main-content" class="flex-1 ml-64 min-w-0 transition-all duration-300">
             <!-- Header -->
             <header class="h-16 border-b border-border-subtle bg-white sticky top-0 z-10 px-6 flex items-center justify-between">
                 <div class="flex items-center gap-3">
+                    <button id="sidebar-toggle" class="text-text-muted hover:text-text-main transition-colors p-1.5 -ml-1.5" onclick="toggleSidebar()">
+                        <i data-lucide="menu" size="20"></i>
+                    </button>
                     <span class="bg-slate-100 text-slate-600 text-[10px] uppercase font-bold px-2 py-1 rounded border border-slate-200">Uso Interno Administrativo</span>
                     <h2 class="text-sm font-semibold text-text-muted uppercase tracking-widest border-l border-slate-200 pl-3">@yield('header-title', 'Gran Cañaveral')</h2>
                 </div>
@@ -118,7 +121,7 @@
             </header>
 
             <!-- Page Content -->
-            <div class="p-8 max-w-7xl mx-auto w-full">
+            <div class="px-8 py-4 max-w-7xl mx-auto w-full">
                 @yield('content')
             </div>
         </main>
@@ -126,6 +129,14 @@
 
     <script>
         lucide.createIcons();
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const main = document.getElementById('main-content');
+            const isHidden = sidebar.classList.toggle('-translate-x-full');
+            main.classList.toggle('ml-64', !isHidden);
+            main.classList.toggle('ml-0', isHidden);
+        }
     </script>
     @stack('scripts')
 </body>

@@ -12,7 +12,7 @@ class ReportController extends Controller
     public function index()
     {
         $allClosedEvents = Event::where('event_status', 'completed')->orderBy('date', 'desc')->get();
-        $closedEvents = Event::where('event_status', 'completed')->orderBy('date', 'desc')->paginate(5);
+        $closedEvents = Event::where('event_status', 'completed')->orderBy('date', 'desc')->paginate(4);
 
         $totalSales = 0;
         $totalEfectivo = 0;
@@ -107,8 +107,8 @@ class ReportController extends Controller
 
     public function show(Event $event)
     {
-        $sales = Sale::where('event_id', $event->id)->orderBy('id', 'desc')->get();
-        $totalAmount = $sales->sum('amount');
+        $totalAmount = Sale::where('event_id', $event->id)->sum('amount');
+        $sales = Sale::where('event_id', $event->id)->orderBy('id', 'desc')->paginate(7);
 
         return view('reports.show', compact('event', 'sales', 'totalAmount'));
     }
@@ -127,10 +127,10 @@ class ReportController extends Controller
 
     public function downloadPdf(Event $event)
     {
-        $events = collect([$event]);
-        $title = 'Reporte - '.$event->client_name;
+        $sales = Sale::where('event_id', $event->id)->with('items')->orderBy('id', 'desc')->get();
+        $totalAmount = $sales->sum('amount');
 
-        $html = view('pdf.report', compact('events', 'title'))->render();
+        $html = view('pdf.event-detail', compact('event', 'sales', 'totalAmount'))->render();
 
         $pdf = Pdf::loadHTML($html);
 
