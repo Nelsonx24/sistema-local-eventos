@@ -343,6 +343,18 @@ currentDate.setDate(1);
 function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
 function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
 
+function showToast(msg) {
+    const existing = document.getElementById('toast-msg');
+    if (existing) existing.remove();
+    const t = document.createElement('div');
+    t.id = 'toast-msg';
+    t.className = 'fixed top-6 left-1/2 -translate-x-1/2 z-[100] bg-slate-900 text-white px-6 py-3 rounded-xl shadow-2xl text-sm font-bold flex items-center gap-3 transition-all duration-300 opacity-0 -translate-y-4';
+    t.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-red-400 shrink-0"><circle cx="12" cy="12" r="10"/><line x1="15" x2="9" y1="9" y2="15"/><line x1="9" x2="15" y1="9" y2="15"/></svg><span>' + msg + '</span>';
+    document.body.appendChild(t);
+    requestAnimationFrame(() => { t.classList.remove('opacity-0', '-translate-y-4'); t.classList.add('opacity-100', 'translate-y-0'); });
+    setTimeout(() => { t.classList.remove('opacity-100', 'translate-y-0'); t.classList.add('opacity-0', '-translate-y-4'); setTimeout(() => t.remove(), 300); }, 3000);
+}
+
 function switchView(view) {
     currentView = view;
     document.getElementById('calendar-nav').classList.toggle('hidden', view !== 'calendar');
@@ -437,7 +449,7 @@ function viewEvent(id) {
             document.getElementById('event-detail-content').innerHTML = html;
             openModal('event-detail-modal');
         })
-        .catch(() => alert('Error al cargar los detalles del evento'));
+        .catch(() => showToast('Error al cargar los detalles del evento'));
 }
 
 function editEvent(id) {
@@ -464,7 +476,7 @@ function editEvent(id) {
             document.getElementById('edit-event-form').action = `/events/${id}`;
             openModal('edit-event-modal');
         })
-        .catch(() => alert('Error al cargar datos del evento'));
+        .catch(() => showToast('Error al cargar datos del evento'));
 }
 
 document.getElementById('edit-date').addEventListener('change', function() {

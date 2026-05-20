@@ -40,7 +40,7 @@
                     <p class="text-slate-500 text-sm">Ingrese sus credenciales para acceder al sistema.</p>
                 </div>
 
-                <form method="POST" action="{{ route('login') }}" class="space-y-6">
+                <form method="POST" action="{{ route('login') }}" autocomplete="off" class="space-y-6">
                     @csrf
 
                     @if($errors->any())
@@ -62,7 +62,7 @@
                             <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-brand-accent transition-colors">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
                             </span>
-                            <input type="password" name="password" placeholder="Contraseña" required
+                            <input type="password" name="password" placeholder="Contraseña" autocomplete="new-password" required
                                 class="w-full pl-12 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-medium outline-none focus:ring-2 focus:ring-brand-accent/20 focus:border-brand-accent transition-all">
                         </div>
                     </div>

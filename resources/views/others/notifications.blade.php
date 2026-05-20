@@ -82,9 +82,21 @@
 </div>
 
 <script>
+function showToast(msg) {
+    const existing = document.getElementById('toast-msg');
+    if (existing) existing.remove();
+    const t = document.createElement('div');
+    t.id = 'toast-msg';
+    t.className = 'fixed top-6 left-1/2 -translate-x-1/2 z-[100] bg-slate-900 text-white px-6 py-3 rounded-xl shadow-2xl text-sm font-bold flex items-center gap-3 transition-all duration-300 opacity-0 -translate-y-4';
+    t.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-emerald-400 shrink-0"><path d="M20 6 9 17l-5-5"/></svg><span>' + msg + '</span>';
+    document.body.appendChild(t);
+    requestAnimationFrame(() => { t.classList.remove('opacity-0', '-translate-y-4'); t.classList.add('opacity-100', 'translate-y-0'); });
+    setTimeout(() => { t.classList.remove('opacity-100', 'translate-y-0'); t.classList.add('opacity-0', '-translate-y-4'); setTimeout(() => t.remove(), 300); }, 3000);
+}
+
 function copyLink() {
     navigator.clipboard.writeText(window.location.href);
-    alert('¡Link copiado! Envíelo a su celular para instalar la PWA.');
+    showToast('¡Link copiado! Envíelo a su celular para instalar la PWA.');
 }
 function requestNotificationPermission() {
     if ('Notification' in window) {

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Event;
 use App\Models\Inventory;
 use App\Models\Sale;
+use App\Models\SaleItem;
 use App\Models\Staff;
 use Carbon\Carbon;
 
@@ -24,35 +25,36 @@ class DashboardController extends Controller
         $inventoryAlerts = Inventory::where('boxes', '<=', 2)->count();
         $staffCount = Staff::where('status', 'Active')->count();
 
-        $chartData = $this->getWeeklySalesData();
+        $chartDataPacena = $this->getProductChartData('Paceña_620cc');
+        $chartDataHuari = $this->getProductChartData('Huari_620cc');
 
         return view('dashboard', compact(
-            'monthlyRevenue',
             'eventsThisMonth',
             'inventoryAlerts',
-            'staffCount',
-            'chartData'
+            'chartDataPacena',
+            'chartDataHuari'
         ));
     }
 
-    private function getWeeklySalesData()
+    private function getProductChartData(string $productName): array
     {
-        $weeks = [];
-        $now = Carbon::now();
+        $events = Event::where('event_status', 'completed')->orderBy('date', 'desc')->take(4)->get();
 
-        for ($i = 3; $i >= 0; $i--) {
-            $weekStart = $now->copy()->subWeeks($i)->startOfWeek();
-            $weekEnd = $weekStart->copy()->endOfWeek();
+        $data = [];
+        foreach ($events->reverse() as $event) {
+            $saleIds = Sale::where('event_id', $event->id)->pluck('id');
 
-            $sales = Sale::whereBetween('date', [$weekStart, $weekEnd])->get();
-            $total = $sales->sum('amount');
+            $cajas = SaleItem::whereIn('sale_id', $saleIds)
+                ->where('name', $productName)
+                ->where('type', 'Caja')
+                ->sum('quantity');
 
-            $weeks[] = [
-                'name' => 'Sem '.(4 - $i),
-                'value' => $total,
+            $data[] = [
+                'name' => $event->client_name,
+                'value' => $cajas,
             ];
         }
 
-        return $weeks;
+        return $data;
     }
 }

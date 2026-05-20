@@ -134,8 +134,20 @@
     @endif
 </div>
 
+@if(session('stock_error'))
+<div id="stock-error-toast" class="fixed top-4 right-4 z-[100] bg-red-50 border border-red-200 text-red-700 px-5 py-3 rounded-xl shadow-lg text-sm font-bold animate-pulse">
+    {{ session('stock_error') }}
+</div>
+<script>
+setTimeout(() => {
+    const el = document.getElementById('stock-error-toast');
+    if (el) el.remove();
+}, 5000);
+</script>
+@endif
+
 <!-- Sale Modal -->
-<div id="sale-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm hidden">
+<div id="sale-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm {{ session('stock_error') ? '' : 'hidden' }}">
     <div class="bg-white rounded-xl shadow-2xl w-full max-w-3xl overflow-hidden border border-border-subtle flex flex-col md:flex-row h-[630px]">
         <div class="w-full md:w-1/2 p-6 border-r border-border-subtle flex flex-col gap-4">
             <h3 class="font-bold text-text-main flex items-center gap-2">
@@ -153,7 +165,7 @@
                             <label class="text-[0.65rem] font-bold text-text-muted uppercase">Nombre del Comprador</label>
                             <button type="button" onclick="document.querySelector('input[name=client_name]').value='Sin Nombre'" class="text-[0.65rem] font-bold text-brand-accent uppercase tracking-widest hover:text-blue-700 transition-colors">S/N</button>
                         </div>
-                        <input type="text" name="client_name" placeholder="Nombre..." autocomplete="off" required class="px-3 py-2 bg-slate-50 border border-border-subtle rounded-lg text-sm outline-none uppercase" oninput="this.value = this.value.toUpperCase(); (this.value.includes(' ') && this.value.split(' ').pop().length >= 2) ? this.setAttribute('list', 'client-suggestions') : this.removeAttribute('list')">
+                        <input type="text" name="client_name" value="{{ old('client_name') }}" placeholder="Nombre..." autocomplete="off" required class="px-3 py-2 bg-slate-50 border border-border-subtle rounded-lg text-sm outline-none uppercase" oninput="this.value = this.value.toUpperCase(); (this.value.includes(' ') && this.value.split(' ').pop().length >= 2) ? this.setAttribute('list', 'client-suggestions') : this.removeAttribute('list')">
                         <datalist id="client-suggestions">
                             @foreach($clientNames as $name)
                             <option value="{{ $name }}">
@@ -366,10 +378,35 @@ function removeFromCart(idx) {
     updateCart();
 }
 
+function showCartAlert() {
+    const existing = document.getElementById('cart-toast');
+    if (existing) existing.remove();
+    const toast = document.createElement('div');
+    toast.id = 'cart-toast';
+    toast.className = 'fixed top-6 left-1/2 -translate-x-1/2 z-[100] bg-slate-900 text-white px-6 py-3 rounded-xl shadow-2xl text-sm font-bold flex items-center gap-3 transition-all duration-300 opacity-0 -translate-y-4';
+    toast.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-amber-400 shrink-0"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg><span>Agregue productos al carrito</span>';
+    document.body.appendChild(toast);
+    requestAnimationFrame(() => {
+        toast.classList.remove('opacity-0', '-translate-y-4');
+        toast.classList.add('opacity-100', 'translate-y-0');
+    });
+    setTimeout(() => {
+        toast.classList.remove('opacity-100', 'translate-y-0');
+        toast.classList.add('opacity-0', '-translate-y-4');
+        setTimeout(() => toast.remove(), 300);
+    }, 3000);
+}
+
+@if(session('stock_error'))
+document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('sale-modal').classList.remove('hidden');
+});
+@endif
+
 document.getElementById('sale-form').addEventListener('submit', function(e) {
     if (cart.length === 0) {
         e.preventDefault();
-        alert('Agregue productos al carrito');
+        showCartAlert();
         return;
     }
     let input = document.createElement('input');

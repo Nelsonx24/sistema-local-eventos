@@ -71,6 +71,21 @@ class SaleController extends Controller
 
         foreach ($items as $item) {
             $inventoryItem = Inventory::where('name', $item['name'])->first();
+            if (! $inventoryItem) {
+                return back()->withErrors(['items' => "Producto {$item['name']} no encontrado en inventario."]);
+            }
+
+            if ($item['type'] === 'Caja' && $inventoryItem->boxes < $item['quantity']) {
+                return back()->withInput()->with('stock_error', "Stock insuficiente de {$item['name']}: hay {$inventoryItem->boxes} caja(s), solicitó {$item['quantity']}.")->with('cart_data', $request->items);
+            }
+
+            if ($item['type'] !== 'Caja') {
+                $totalUnits = ($inventoryItem->boxes * $inventoryItem->units_per_box) + $inventoryItem->loose_units;
+                if ($totalUnits < $item['quantity']) {
+                    return back()->withInput()->with('stock_error', "Stock insuficiente de {$item['name']}: hay {$totalUnits} unidad(es), solicitó {$item['quantity']}.")->with('cart_data', $request->items);
+                }
+            }
+
             if ($inventoryItem) {
                 $price = $item['type'] === 'Caja'
                     ? $inventoryItem->price_per_box

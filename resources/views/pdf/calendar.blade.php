@@ -41,7 +41,7 @@
         <tbody>
             @foreach($events as $event)
             <tr>
-                <td>{{ $event->date->format('d/m/Y') }}</td>
+                <td>{{ mb_strtoupper($event->date->locale('es')->translatedFormat('d/F/Y')) }}</td>
                 <td>{{ $event->client_name }}</td>
                 <td>{{ $event->client_phone ?? '—' }}</td>
                 <td>{{ $event->event_type }}</td>

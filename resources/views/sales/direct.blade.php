@@ -109,8 +109,20 @@
     </div>
 </div>
 
+@if(session('stock_error'))
+<div id="stock-error-toast" class="fixed top-4 right-4 z-[100] bg-red-50 border border-red-200 text-red-700 px-5 py-3 rounded-xl shadow-lg text-sm font-bold animate-pulse">
+    {{ session('stock_error') }}
+</div>
+<script>
+setTimeout(() => {
+    const el = document.getElementById('stock-error-toast');
+    if (el) el.remove();
+}, 5000);
+</script>
+@endif
+
 <!-- Sale Modal -->
-<div id="sale-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm hidden">
+<div id="sale-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm {{ session('stock_error') ? '' : 'hidden' }}">
     <div class="bg-white rounded-xl shadow-2xl w-full max-w-3xl overflow-hidden border border-border-subtle flex flex-col md:flex-row h-[630px]">
         <div class="w-full md:w-1/2 p-6 border-r border-border-subtle flex flex-col gap-4">
             <div class="flex flex-col gap-1 mb-2">
@@ -133,7 +145,7 @@
                             <label class="text-[0.65rem] font-bold text-text-muted uppercase tracking-widest">Nombre del Comprador</label>
                             <button type="button" onclick="document.querySelector('input[name=client_name]').value='Sin Nombre'" class="text-[0.65rem] font-bold text-brand-accent uppercase tracking-widest hover:text-blue-700 transition-colors">S/N</button>
                         </div>
-                        <input type="text" name="client_name" value="Sin Nombre" placeholder="Nombre..." autocomplete="off" required class="px-3 py-2 bg-slate-50 border border-border-subtle rounded-lg text-sm outline-none focus:ring-1 focus:ring-brand-accent/30" oninput="(this.value.includes(' ') && this.value.split(' ').pop().length >= 2) ? this.setAttribute('list', 'client-suggestions') : this.removeAttribute('list')">
+                        <input type="text" name="client_name" value="{{ old('client_name', 'Sin Nombre') }}" placeholder="Nombre..." autocomplete="off" required class="px-3 py-2 bg-slate-50 border border-border-subtle rounded-lg text-sm outline-none focus:ring-1 focus:ring-brand-accent/30" oninput="(this.value.includes(' ') && this.value.split(' ').pop().length >= 2) ? this.setAttribute('list', 'client-suggestions') : this.removeAttribute('list')">
                         <datalist id="client-suggestions">
                             @foreach($clientNames as $name)
                             <option value="{{ $name }}">
@@ -403,6 +415,12 @@ function updateChange() {
     document.getElementById('change-display').textContent = change.toLocaleString() + ' Bs';
     updateTotal();
 }
+
+@if(session('stock_error'))
+document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('sale-modal').classList.remove('hidden');
+});
+@endif
 
 function submitSale() {
     if (cart.length === 0) return;
