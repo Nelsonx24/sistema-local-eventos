@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Config;
 use App\Models\Event;
+use App\Models\Log;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -59,7 +60,9 @@ class EventController extends Controller
         $validated['event_status'] = 'upcoming';
         $validated['registered_by'] = Auth::user()->name;
 
-        Event::create($validated);
+        $event = Event::create($validated);
+
+        Log::record('Evento', 'Crear', "Evento {$event->client_name} registrado para el {$event->date->format('d/m/Y')}");
 
         return redirect()->route('events.index')->with('success', 'Evento registrado exitosamente.');
     }
@@ -164,13 +167,18 @@ class EventController extends Controller
 
         $event->update($validated);
 
+        Log::record('Evento', 'Actualizar', "Evento {$event->client_name} actualizado");
+
         return redirect()->route('events.index')->with('success', 'Evento actualizado.');
     }
 
     public function destroy(Event $event)
     {
+        $name = $event->client_name;
         $event->update(['event_status' => 'cancelled']);
         $event->delete();
+
+        Log::record('Evento', 'Eliminar', "Evento {$name} eliminado");
 
         return redirect()->route('events.index')->with('success', 'Evento eliminado.');
     }
@@ -182,6 +190,8 @@ class EventController extends Controller
             'balance_pending' => 0,
             'payment_status' => 'paid',
         ]);
+
+        Log::record('Evento', 'Actualizar', "Saldo pagado para evento {$event->client_name}");
 
         return back()->with('success', 'Saldo pagado completamente.');
     }
@@ -206,6 +216,8 @@ class EventController extends Controller
     {
         $event->update(['event_status' => 'completed']);
 
+        Log::record('Evento', 'Actualizar', "Evento {$event->client_name} cerrado");
+
         return back()->with('success', 'Evento cerrado.');
     }
 
@@ -219,6 +231,7 @@ class EventController extends Controller
             if (! in_array($newType, $types)) {
                 $types[] = $newType;
                 Config::setEventTypes($types);
+                Log::record('Configuración', 'Crear', "Tipo de evento {$newType} agregado");
             }
         }
 
@@ -226,6 +239,7 @@ class EventController extends Controller
             $types = Config::getEventTypes();
             $types = array_filter($types, fn ($t) => $t !== $request->type);
             Config::setEventTypes(array_values($types));
+            Log::record('Configuración', 'Eliminar', "Tipo de evento {$request->type} eliminado");
         }
 
         return back();

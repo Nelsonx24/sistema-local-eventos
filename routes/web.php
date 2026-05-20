@@ -4,6 +4,7 @@ use App\Http\Controllers\Auth\StaffAuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\InventoryController;
+use App\Http\Controllers\LogController;
 use App\Http\Controllers\OthersController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SaleController;
@@ -53,9 +54,14 @@ Route::middleware(['auth:staff'])->group(function () {
     Route::delete('/sales/{sale}', [SaleController::class, 'destroy'])->name('sales.destroy');
     Route::post('/sales/event/{event}/close', [SaleController::class, 'closeEvent'])->name('sales.event.close');
 
+    Route::get('/logs', [LogController::class, 'index'])->name('logs.index');
+
     Route::get('/staff', [StaffController::class, 'index'])->name('staff.index');
+    Route::get('/staff/{staff}', [StaffController::class, 'show'])->name('staff.show');
+    Route::get('/staff/{staff}/edit', [StaffController::class, 'edit'])->name('staff.edit');
     Route::post('/staff', [StaffController::class, 'store'])->name('staff.store');
     Route::put('/staff/{staff}', [StaffController::class, 'update'])->name('staff.update');
+    Route::post('/staff/{staff}/password', [StaffController::class, 'changePassword'])->name('staff.password');
     Route::delete('/staff/{staff}', [StaffController::class, 'destroy'])->name('staff.destroy');
 
     Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');

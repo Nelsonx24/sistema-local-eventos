@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Event;
 use App\Models\Inventory;
+use App\Models\Log;
 use App\Models\Sale;
 use App\Models\SaleItem;
 use Illuminate\Http\Request;
@@ -114,6 +115,8 @@ class SaleController extends Controller
             ]);
         }
 
+        Log::record('Venta', 'Crear', "Venta de Bs {$totalAmount} a {$validated['client_name']} ({$validated['payment_method']})");
+
         return redirect()->back()->with('success', 'Venta procesada correctamente.');
     }
 
@@ -126,7 +129,11 @@ class SaleController extends Controller
 
     public function destroy(Sale $sale)
     {
+        $clientName = $sale->client_name;
+        $amount = $sale->amount;
         $sale->delete();
+
+        Log::record('Venta', 'Eliminar', "Venta de Bs {$amount} a {$clientName} eliminada");
 
         return back()->with('success', 'Venta eliminada.');
     }
@@ -134,6 +141,8 @@ class SaleController extends Controller
     public function closeEvent(Event $event)
     {
         $event->update(['status' => 'Cerrado']);
+
+        Log::record('Venta', 'Actualizar', "Evento {$event->client_name} cerrado desde ventas");
 
         return back()->with('success', 'Evento cerrado correctamente.');
     }

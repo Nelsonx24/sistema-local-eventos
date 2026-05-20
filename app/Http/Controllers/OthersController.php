@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Asset;
 use App\Models\Config;
+use App\Models\Log;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 
@@ -34,6 +35,8 @@ class OthersController extends Controller
             Config::setQR($request->qr_url ?? Config::getQR());
         }
 
+        Log::record('Configuración', 'Actualizar', 'Código QR actualizado');
+
         return back()->with('success', 'QR actualizado.');
     }
 
@@ -55,12 +58,17 @@ class OthersController extends Controller
 
         Asset::create($validated);
 
+        Log::record('Inventario', 'Crear', "Activo {$validated['name']} registrado");
+
         return back()->with('success', 'Activo registrado.');
     }
 
     public function destroyAsset(Asset $asset)
     {
+        $name = $asset->name;
         $asset->delete();
+
+        Log::record('Inventario', 'Eliminar', "Activo {$name} eliminado");
 
         return back()->with('success', 'Activo eliminado.');
     }
@@ -88,6 +96,8 @@ class OthersController extends Controller
             $path = $request->file('watermark')->store('watermarks', 'public');
             Config::setWatermark($path);
         }
+
+        Log::record('Configuración', 'Actualizar', 'Configuración de contrato actualizada');
 
         return back()->with('success', 'Configuración de contrato guardada.');
     }

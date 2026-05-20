@@ -44,6 +44,7 @@
                     ['id' => 'inventory', 'label' => 'Inventario', 'icon' => 'package', 'route' => 'inventory.index', 'roles' => ['Administrador']],
                     ['id' => 'sales', 'label' => 'Ventas', 'icon' => 'dollar-sign', 'route' => 'sales.index', 'roles' => ['Administrador', 'Vendedor']],
                     ['id' => 'staff', 'label' => 'Personal', 'icon' => 'users', 'route' => 'staff.index', 'roles' => ['Administrador']],
+    ['id' => 'logs', 'label' => 'Logs', 'icon' => 'scroll-text', 'route' => 'logs.index', 'roles' => ['Administrador']],
                     ['id' => 'reports', 'label' => 'Reportes', 'icon' => 'pie-chart', 'route' => 'reports.index', 'roles' => ['Administrador', 'Vendedor', 'CM']],
                     ['id' => 'others', 'label' => 'Otros', 'icon' => 'settings', 'route' => 'others.index', 'roles' => ['Administrador', 'CM']],
                     ['id' => 'settings', 'label' => 'Configuración', 'icon' => 'settings', 'route' => 'settings.index', 'roles' => ['Administrador']],

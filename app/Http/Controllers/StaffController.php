@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Log;
 use App\Models\Staff;
 use Illuminate\Http\Request;
 
@@ -14,16 +15,29 @@ class StaffController extends Controller
         return view('staff.index', compact('staff'));
     }
 
+    public function show(Staff $staff)
+    {
+        return response()->json($staff);
+    }
+
+    public function edit(Staff $staff)
+    {
+        return response()->json($staff);
+    }
+
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
+            'first_name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
             'email' => 'required|email|unique:staff,email',
             'role' => 'required|string',
             'username' => 'nullable|string|unique:staff,username',
             'password' => 'nullable|string',
             'status' => 'string',
         ]);
+
+        $validated['name'] = trim($validated['first_name'].' '.$validated['last_name']);
 
         if (in_array($validated['role'], ['Administrador', 'Vendedor'])) {
             $validated['username'] = $request->username;
@@ -33,7 +47,9 @@ class StaffController extends Controller
         $validated['avatar'] = 'https://api.dicebear.com/7.x/avataaars/svg?seed='.str_replace(' ', '', $validated['name']);
         $validated['status'] = $request->status ?? 'Active';
 
-        Staff::create($validated);
+        $staffMember = Staff::create($validated);
+
+        Log::record('Personal', 'Crear', "Trabajador {$staffMember->name} registrado como {$staffMember->role}");
 
         return redirect()->route('staff.index')->with('success', 'Personal registrado.');
     }
@@ -41,13 +57,16 @@ class StaffController extends Controller
     public function update(Request $request, Staff $staff)
     {
         $validated = $request->validate([
-            'name' => 'string|max:255',
+            'first_name' => 'string|max:255',
+            'last_name' => 'string|max:255',
             'email' => 'email|unique:staff,email,'.$staff->id,
             'role' => 'string',
             'username' => 'nullable|string|unique:staff,username,'.$staff->id,
             'password' => 'nullable|string',
             'status' => 'string',
         ]);
+
+        $validated['name'] = trim($validated['first_name'].' '.$validated['last_name']);
 
         if (in_array($validated['role'], ['Administrador', 'Vendedor'])) {
             if ($request->password) {
@@ -59,12 +78,31 @@ class StaffController extends Controller
 
         $staff->update($validated);
 
+        Log::record('Personal', 'Actualizar', "Trabajador {$staff->name} actualizado");
+
         return redirect()->route('staff.index')->with('success', 'Personal actualizado.');
+    }
+
+    public function changePassword(Request $request, Staff $staff)
+    {
+        $request->validate([
+            'password' => 'required|string|min:6',
+        ]);
+
+        $staff->password = bcrypt($request->password);
+        $staff->save();
+
+        Log::record('Personal', 'Actualizar', "Contraseña cambiada para {$staff->name}");
+
+        return redirect()->route('staff.index')->with('success', 'Contraseña actualizada.');
     }
 
     public function destroy(Staff $staff)
     {
+        $name = $staff->name;
         $staff->delete();
+
+        Log::record('Personal', 'Eliminar', "Trabajador {$name} eliminado");
 
         return redirect()->route('staff.index')->with('success', 'Personal eliminado.');
     }

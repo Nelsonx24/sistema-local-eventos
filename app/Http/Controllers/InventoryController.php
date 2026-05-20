@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Inventory;
+use App\Models\Log;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 
@@ -39,7 +40,9 @@ class InventoryController extends Controller
             $validated['image_unit'] = $request->file('image_unit')->store('inventory', 'public');
         }
 
-        Inventory::create($validated);
+        $item = Inventory::create($validated);
+
+        Log::record('Inventario', 'Crear', "Producto {$item->name} registrado en inventario");
 
         return redirect()->route('inventory.index')->with('success', 'Producto registrado.');
     }
@@ -65,12 +68,17 @@ class InventoryController extends Controller
 
         $inventory->update($validated);
 
+        Log::record('Inventario', 'Actualizar', "Producto {$inventory->name} actualizado");
+
         return redirect()->route('inventory.index')->with('success', 'Producto actualizado.');
     }
 
     public function destroy(Inventory $inventory)
     {
+        $name = $inventory->name;
         $inventory->delete();
+
+        Log::record('Inventario', 'Eliminar', "Producto {$name} eliminado del inventario");
 
         return redirect()->route('inventory.index')->with('success', 'Producto eliminado.');
     }
@@ -88,6 +96,8 @@ class InventoryController extends Controller
         $inventory->loose_units += $validated['loose_to_add'] ?? 0;
         $inventory->save();
 
+        Log::record('Inventario', 'Actualizar', "Stock reabastecido: {$inventory->name} (+{$validated['boxes_to_add']} cajas, +{$validated['loose_to_add']} unidades)");
+
         return back()->with('success', 'Stock reabastecido.');
     }
 
@@ -103,6 +113,8 @@ class InventoryController extends Controller
         $inventory->boxes = $validated['physical_boxes'];
         $inventory->loose_units = $validated['physical_loose'];
         $inventory->save();
+
+        Log::record('Inventario', 'Actualizar', "Cotejo realizado para {$inventory->name} ({$validated['physical_boxes']} cajas, {$validated['physical_loose']} unidades)");
 
         return back()->with('success', 'Cotejo de inventario sincronizado.');
     }
@@ -120,6 +132,8 @@ class InventoryController extends Controller
             'price_per_box' => $validated['price_per_box'],
             'price_per_unit' => $validated['price_per_unit'],
         ]);
+
+        Log::record('Inventario', 'Actualizar', "Precios actualizados para {$inventory->name}");
 
         return back()->with('success', 'Precios actualizados.');
     }
