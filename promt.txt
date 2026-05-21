@@ -1,16 +1,30 @@
-en venta directa que este escrito sin nombre siempre y se pueda borrar si quiere escribir en ventas
-Thought: The user wants the "Cliente" field in the direct sale form to always show a default name (probably something like "Sin Nombre" or just pre-filled) and allow the user to type over it if they want.
-Let me look at the direct sale view to find the client name input.
-✱ Grep "client_name" in resources\views\sales (2 matches)
-← Edit resources\views\sales\direct.blade.php
-<div class="flex flex-col gap-3">
-    <div class="flex flex-col gap-1">
-        <label class="text-[0.65rem] font-bold text-text-muted uppercase tracking-widest">Nombre del Comprador</label>
-        <input type="text" name="client_name" placeholder="Nombre..." required class="px-3 py-2 bg-slate-50 border border-border-subtle rounded-lg text-sm outline-none focus:ring-1 focus:ring-brand-accent/30">
-        <input type="text" name="client_name" value="Sin Nombre" placeholder="Nombre..." required class="px-3 py-2 bg-slate-50 border border-border-subtle rounded-lg text-sm outline-none focus:ring-1 focus:ring-brand-accent/30">
-    </div>
-    <div class="flex flex-col gap-1">
-        <label class="text-[0.65rem] font-bold text-text-muted uppercase tracking-widest">Tipo de Pago</label>
+Thought: Now I understand the issues with the failing tests. Let me look at the test files to see what they're sending and compare with what the controllers expect.
+Key issues:
+1. Event factory: client_id is not set - the events table requires client_id as a non-nullable string
+2. Event test: event store requires client_id and other fields
+3. Event types test: expects new_type field
+4. Inventory restock: expects inventory_id field (not product_id)
+5. Staff test: missing email and role fields
+Let me read the actual test files to understand exactly what needs to change.
+Let me read the test files to identify what needs fixing.
+→ Read tests\Feature\EventTest.php 
+→ Read tests\Feature\InventoryTest.php 
+→ Read tests\Feature\StaffTest.php 
+Thought: Let me analyze each failure:
+1. DashboardTest - max() error because no completed events with specific products. Need to create events with sales containing the right product names.
+2. EventTest - create event: Missing client_id in the $eventData. The controller requires client_id as required string.
+3. EventTest - manage event types: It sends types but the controller's POST path expects new_type. Let me re-read the manageTypes method.
+4. InventoryTest - restock: It sends product_id but the controller expects inventory_id.
+5. StaffTest - requires username: Missing email and role which are required.
+6. SettingsTest: Need to check what's happening.
+7. LogTest: Need to check.
+Let me read the controllers more carefully, and also the other test files.
+→ Read app\Http\Controllers\EventController.php [limit=60]
+→ Read app\Http\Controllers\EventController.php [offset=220, limit=40]
+→ Read tests\Feature\DashboardTest.php 
+→ Read tests\Feature\SettingsTest.php 
+→ Read tests\Feature\LogTest.php 
+
 
 registrar bien los tipos de eventos
 en el login y el sistema poner el logo del local

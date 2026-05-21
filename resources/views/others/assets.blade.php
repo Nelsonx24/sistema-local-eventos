@@ -47,7 +47,7 @@
                 <tr class="hover:bg-slate-50 transition-colors group">
                     <td class="px-6 py-4 font-bold text-slate-700">{{ $asset->name }}</td>
                     <td class="px-6 py-4">
-                        <span class="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider {{ $asset->category === 'Cocina' ? 'bg-orange-50 text-orange-600 border border-orange-100' : 'bg-blue-50 text-blue-600 border border-blue-100' }}">
+                        <span class="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider {{ $asset->category === 'Cocina' ? 'bg-orange-50 text-orange-600 border border-orange-100' : 'bg-brand-gold/10 text-brand-gold border border-brand-gold/20' }}">
                             {{ $asset->category }}
                         </span>
                     </td>

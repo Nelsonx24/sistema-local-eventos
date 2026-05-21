@@ -27,7 +27,7 @@
             </div>
             <div class="p-6 flex-1">
                 <div class="h-[300px] flex items-end justify-around gap-2">
-                    @php $maxPacena = max(array_column($chartDataPacena, 'value')) ?: 1; @endphp
+                    @php $maxPacena = ! empty($chartDataPacena) ? max(array_column($chartDataPacena, 'value')) : 1; @endphp
                     @foreach($chartDataPacena as $data)
                     <div class="flex flex-col items-center gap-2 max-w-[60px]">
                         <div class="w-full bg-red-600 rounded-t" style="height: {{ $data['value'] > 0 ? ($data['value'] / $maxPacena * 200) : 4 }}px; min-height: 4px;"></div>
@@ -45,7 +45,7 @@
             </div>
             <div class="p-6 flex-1">
                 <div class="h-[300px] flex items-end justify-around gap-2">
-                    @php $maxHuari = max(array_column($chartDataHuari, 'value')) ?: 1; @endphp
+                    @php $maxHuari = ! empty($chartDataHuari) ? max(array_column($chartDataHuari, 'value')) : 1; @endphp
                     @foreach($chartDataHuari as $data)
                     <div class="flex flex-col items-center gap-2 max-w-[60px]">
                         <div class="w-full bg-black rounded-t" style="height: {{ $data['value'] > 0 ? ($data['value'] / $maxHuari * 200) : 4 }}px; min-height: 4px;"></div>

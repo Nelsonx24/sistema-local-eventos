@@ -8,6 +8,7 @@
     <!-- Toolbar -->
     <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 px-6 py-4 bg-white rounded-lg border border-border-subtle shadow-sm">
         <h3 class="font-semibold text-text-main">Administración de Inventario</h3>
+        @if(Auth::guard('staff')->user()->role === 'Administrador')
         <div class="flex flex-wrap gap-2">
             <a href="{{ route('inventory.pdf') }}" target="_blank" class="bg-amber-500 text-white px-4 py-2 rounded-[6px] text-[0.75rem] font-bold hover:bg-amber-400 flex items-center gap-2 shadow-sm transition-all">
                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
@@ -25,11 +26,12 @@
                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
                 Reabastecer Stock
             </button>
-            <button onclick="openModal('prices-modal')" class="bg-blue-600 text-white px-4 py-2 rounded-[6px] text-[0.75rem] font-bold hover:bg-blue-500 flex items-center gap-2 shadow-sm transition-all">
+            <button onclick="openModal('prices-modal')" class="bg-brand-gold text-white px-4 py-2 rounded-[6px] text-[0.75rem] font-bold hover:bg-brand-gold-dark flex items-center gap-2 shadow-sm transition-all">
                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" x2="12" y1="2" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
                 Actualizar Precios
             </button>
         </div>
+        @endif
     </div>
 
     <!-- Inventory Table -->
@@ -64,7 +66,7 @@
                         </div>
                     </td>
                     <td class="px-6 py-4 text-center">
-                        <div class="inline-flex items-center gap-1.5 px-3 py-1 bg-blue-50 text-blue-700 rounded-full font-mono font-bold text-[0.875rem]">
+                        <div class="inline-flex items-center gap-1.5 px-3 py-1 bg-brand-gold/10 text-brand-gold rounded-full font-mono font-bold text-[0.875rem]">
                             {{ $item->boxes }}
                         </div>
                     </td>
@@ -85,11 +87,11 @@
                         </span>
                     </td>
                     <td class="px-6 py-4">
+                        @if(Auth::guard('staff')->user()->role === 'Administrador')
                         <div class="flex justify-end gap-2 text-text-muted">
                             <button onclick="viewItem({{ $item->id }})" class="p-1 hover:text-brand-accent transition-colors" title="Ver detalles">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
                             </button>
-                            @if(Auth::guard('staff')->user()->role === 'Administrador')
                             <button onclick="editItem('{{ $item->id }}', '{{ addslashes($item->name) }}', '{{ $item->category }}', '{{ $item->units_per_box }}', '{{ $item->price_per_box }}', '{{ $item->price_per_unit }}')" class="p-1 hover:text-amber-600 transition-colors" title="Editar">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.83 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
                             </button>
@@ -100,8 +102,8 @@
                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
                                 </button>
                             </form>
-                            @endif
                         </div>
+                        @endif
                     </td>
                 </tr>
                 @empty
@@ -210,8 +212,8 @@
 <!-- Prices Modal -->
 <div id="prices-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm hidden">
     <div class="bg-white rounded-xl shadow-2xl w-full max-w-md border border-border-subtle">
-        <div class="flex justify-between items-center px-6 py-4 border-b border-border-subtle bg-blue-50">
-            <h3 class="font-bold text-blue-800 flex items-center gap-2">
+        <div class="flex justify-between items-center px-6 py-4 border-b border-border-subtle bg-brand-gold/10">
+            <h3 class="font-bold text-brand-gold flex items-center gap-2">
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" x2="12" y1="2" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
                 Actualizar Precios
             </h3>
@@ -238,7 +240,7 @@
                     <input type="number" step="any" name="price_per_unit" required class="px-4 py-2 bg-slate-50 border border-border-subtle rounded-lg text-sm">
                 </div>
             </div>
-            <button type="submit" class="mt-4 bg-blue-600 text-white py-2.5 rounded-lg font-bold">Publicar Nuevos Precios</button>
+            <button type="submit" class="mt-4 bg-brand-gold text-white py-2.5 rounded-lg font-bold hover:bg-brand-gold-dark transition-all">Publicar Nuevos Precios</button>
         </form>
     </div>
 </div>
@@ -320,7 +322,7 @@
             <div class="grid grid-cols-2 gap-4 text-sm">
                 <div class="bg-slate-50 rounded-lg p-3">
                     <p class="text-[0.6rem] font-bold text-text-muted uppercase tracking-wider">Cajas</p>
-                    <p id="view-boxes" class="text-xl font-bold text-blue-700"></p>
+                    <p id="view-boxes" class="text-xl font-bold text-brand-gold"></p>
                 </div>
                 <div class="bg-slate-50 rounded-lg p-3">
                     <p class="text-[0.6rem] font-bold text-text-muted uppercase tracking-wider">Unidades</p>

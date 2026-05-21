@@ -44,7 +44,7 @@
                     </a>
                     <hr class="mx-3 border-slate-100">
                     <button onclick="openModal('report-filter-modal')" class="w-full text-left flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-blue-600"><path d="M4 7V4h16v3"/><path d="M9 20h6"/><path d="M12 4v16"/></svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-brand-gold"><path d="M4 7V4h16v3"/><path d="M9 20h6"/><path d="M12 4v16"/></svg>
                         <div>
                             <p class="font-bold text-slate-800">Reporte por Fechas</p>
                             <p class="text-xs text-slate-500 font-normal">Filtrar por año, mes o rango de fechas</p>
@@ -52,10 +52,12 @@
                     </button>
                 </div>
             </div>
+            @if(Auth::guard('staff')->user()->role === 'Administrador')
             <button onclick="openModal('types-modal')" class="bg-slate-100 text-slate-700 px-4 py-2 rounded-lg flex items-center gap-2 text-sm font-bold hover:bg-slate-200 transition-all border border-slate-200 shadow-sm">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" x2="21" y1="6" y2="6"/><line x1="8" x2="21" y1="12" y2="12"/><line x1="8" x2="21" y1="18" y2="18"/><line x1="3" x2="3.01" y1="6" y2="6"/><line x1="3" x2="3.01" y1="12" y2="12"/><line x1="3" x2="3.01" y1="18" y2="18"/></svg>
                 Tipos
             </button>
+            @endif
             <button onclick="openModal('event-modal')" class="bg-brand-primary text-white px-4 py-2 rounded-lg flex items-center gap-2 text-sm font-bold hover:bg-slate-800 transition-all shadow-md">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
                 Nuevo Evento
@@ -111,7 +113,7 @@
                         <p class="text-[0.875rem] font-bold text-slate-800 leading-tight">{{ $event->client_name }}</p>
                     </td>
                     <td class="px-6 py-4 text-center">
-                        <span class="px-3 py-1 rounded-full text-[0.65rem] font-bold border {{ $event->event_type === 'Boda' ? 'bg-blue-50 text-blue-700 border-blue-100' : ($event->event_type === 'Corporativo' ? 'bg-purple-50 text-purple-700 border-purple-100' : 'bg-emerald-50 text-emerald-700 border-emerald-100') }}">
+                        <span class="px-3 py-1 rounded-full text-[0.65rem] font-bold border {{ $event->event_type === 'Boda' ? 'bg-brand-gold/10 text-brand-gold border-brand-gold/20' : ($event->event_type === 'Corporativo' ? 'bg-purple-50 text-purple-700 border-purple-100' : 'bg-emerald-50 text-emerald-700 border-emerald-100') }}">
                             {{ $event->event_type }}
                         </span>
                     </td>
@@ -120,7 +122,7 @@
                             <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[0.6rem] font-bold border {{ $event->payment_status === 'paid' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : ($event->payment_status === 'cancelled' ? 'bg-red-50 text-red-700 border-red-200' : 'bg-amber-50 text-amber-700 border-amber-200') }}">
                                 {{ $event->payment_status === 'paid' ? 'Pagado' : ($event->payment_status === 'cancelled' ? 'Cancelado' : 'Pte. Pago') }}
                             </span>
-                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[0.6rem] font-bold border {{ $event->event_status === 'completed' ? 'bg-slate-100 text-slate-600 border-slate-200' : ($event->event_status === 'cancelled' ? 'bg-red-50 text-red-700 border-red-200' : 'bg-blue-50 text-blue-700 border-blue-200') }}">
+                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[0.6rem] font-bold border {{ $event->event_status === 'completed' ? 'bg-slate-100 text-slate-600 border-slate-200' : ($event->event_status === 'cancelled' ? 'bg-red-50 text-red-700 border-red-200' : 'bg-brand-gold/10 text-brand-gold border-brand-gold/20') }}">
                                 {{ $event->event_status === 'completed' ? 'Finalizado' : ($event->event_status === 'cancelled' ? 'Cancelado' : 'Próximo') }}
                             </span>
                         </div>
@@ -133,7 +135,7 @@
                             <button onclick="editEvent({{ $event->id }})" class="p-2 hover:bg-slate-100 hover:text-amber-600 rounded-lg transition-all" title="Editar">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.83 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
                             </button>
-                            <a href="{{ route('events.download-contract', $event->id) }}" target="_blank" class="p-2 hover:bg-slate-100 hover:text-blue-600 rounded-lg transition-all" title="Descargar Contrato">
+                            <a href="{{ route('events.download-contract', $event->id) }}" target="_blank" class="p-2 hover:bg-slate-100 hover:text-brand-gold rounded-lg transition-all" title="Descargar Contrato">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
                             </a>
                             @if(Auth::guard('staff')->user()->role === 'Administrador')
@@ -222,7 +224,7 @@
                     <input type="hidden" name="payment_due_date" id="payment-due-input">
                 </div>
             </div>
-            <button type="submit" class="mt-4 bg-brand-accent text-white py-2.5 rounded-[6px] font-bold hover:bg-blue-600 transition-all shadow-md">
+            <button type="submit" class="mt-4 bg-brand-accent text-white py-2.5 rounded-[6px] font-bold hover:bg-brand-gold-dark transition-all shadow-md">
                 Confirmar Reserva
             </button>
         </form>
@@ -394,7 +396,7 @@ function renderCalendar() {
     const isToday = (todayYear === year && todayMonth === month);
     
     const typeColors = {
-        'Boda': 'bg-blue-500',
+        'Boda': 'bg-brand-gold',
         'Corporativo': 'bg-purple-500',
         'Social': 'bg-emerald-500',
         'Cumpleaños': 'bg-orange-500',
@@ -417,10 +419,10 @@ function renderCalendar() {
         const dayEvents = eventsData.filter(e => e.date === dateStr);
         
         html += `
-            <div class="min-h-[120px] p-2 border-r border-b border-slate-100 hover:bg-slate-50 transition-colors ${isTodayDay ? 'bg-blue-50/50' : 'bg-white'}">
+            <div class="min-h-[120px] p-2 border-r border-b border-slate-100 hover:bg-slate-50 transition-colors ${isTodayDay ? 'bg-brand-gold/5' : 'bg-white'}">
                 <div class="flex justify-between items-center mb-2">
                     <span class="text-sm font-semibold ${isTodayDay ? 'bg-brand-accent text-white w-7 h-7 rounded-full flex items-center justify-center' : 'text-slate-600'}">${day}</span>
-                    ${dayEvents.length > 0 ? `<span class="text-xs font-bold text-brand-accent bg-blue-100 px-2 py-0.5 rounded-full">${dayEvents.length}</span>` : ''}
+                    ${dayEvents.length > 0 ? `<span class="text-xs font-bold text-brand-accent bg-brand-gold/10 px-2 py-0.5 rounded-full">${dayEvents.length}</span>` : ''}
                 </div>
                 <div class="space-y-1 overflow-hidden">`;
         
@@ -578,3 +580,4 @@ function deleteEvent(id) {
     </div>
 </div>
 @endsection
+

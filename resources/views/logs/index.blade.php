@@ -64,7 +64,7 @@
                         <td class="px-5 py-3">
                             <span class="px-2 py-0.5 rounded-full text-[0.65rem] font-semibold
                                 @switch($log->type)
-                                    @case('Evento') bg-blue-50 text-blue-700 @break
+                                    @case('Evento') bg-brand-gold/10 text-amber-700 @break
                                     @case('Inventario') bg-amber-50 text-amber-700 @break
                                     @case('Venta') bg-emerald-50 text-emerald-700 @break
                                     @case('Personal') bg-purple-50 text-purple-700 @break
@@ -78,7 +78,7 @@
                             <span class="px-2 py-0.5 rounded-full text-[0.65rem] font-semibold
                                 @switch($log->action)
                                     @case('Crear') bg-green-50 text-green-700 @break
-                                    @case('Actualizar') bg-blue-50 text-blue-700 @break
+                                    @case('Actualizar') bg-amber-50 text-amber-700 @break
                                     @case('Eliminar') bg-red-50 text-red-700 @break
                                     @default bg-slate-50 text-slate-600
                                 @endswitch">
@@ -103,3 +103,4 @@
     </div>
 </div>
 @endsection
+

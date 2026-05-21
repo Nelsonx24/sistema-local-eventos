@@ -32,17 +32,12 @@ class StaffController extends Controller
             'last_name' => 'required|string|max:255',
             'email' => 'required|email|unique:staff,email',
             'role' => 'required|string',
-            'username' => 'nullable|string|unique:staff,username',
-            'password' => 'nullable|string',
+            'username' => 'required|string|unique:staff,username',
+            'password' => 'required|string|min:8',
             'status' => 'string',
         ]);
 
         $validated['name'] = trim($validated['first_name'].' '.$validated['last_name']);
-
-        if (in_array($validated['role'], ['Administrador', 'Vendedor'])) {
-            $validated['username'] = $request->username;
-            $validated['password'] = $request->password;
-        }
 
         $validated['avatar'] = 'https://api.dicebear.com/7.x/avataaars/svg?seed='.str_replace(' ', '', $validated['name']);
         $validated['status'] = $request->status ?? 'Active';
@@ -68,12 +63,10 @@ class StaffController extends Controller
 
         $validated['name'] = trim($validated['first_name'].' '.$validated['last_name']);
 
-        if (in_array($validated['role'], ['Administrador', 'Vendedor'])) {
-            if ($request->password) {
-                $validated['password'] = $request->password;
-            }
+        if ($request->filled('password')) {
+            $validated['password'] = $request->password;
         } else {
-            unset($validated['username'], $validated['password']);
+            unset($validated['password']);
         }
 
         $staff->update($validated);

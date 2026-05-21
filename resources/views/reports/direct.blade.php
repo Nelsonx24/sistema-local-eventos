@@ -11,7 +11,7 @@
             Volver a Reportes
         </a>
         <div class="flex items-center gap-2">
-            <a href="{{ route('reports.direct.pdf', $date) }}" target="_blank" class="flex items-center gap-2 text-xs font-bold bg-brand-accent text-white px-4 py-2 rounded-xl hover:bg-blue-600 transition-all shadow-md active:scale-95">
+            <a href="{{ route('reports.direct.pdf', $date) }}" target="_blank" class="flex items-center gap-2 text-xs font-bold bg-brand-accent text-white px-4 py-2 rounded-xl hover:bg-brand-gold transition-all shadow-md active:scale-95">
                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
                 Descargar PDF
             </a>

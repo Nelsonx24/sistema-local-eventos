@@ -7,6 +7,7 @@ use App\Models\Staff;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 
 class StaffAuthController extends Controller
 {
@@ -24,12 +25,18 @@ class StaffAuthController extends Controller
 
         $staff = Staff::where('username', $request->username)->first();
 
-        if ($staff && ($staff->password === $request->password || Hash::check($request->password, $staff->password))) {
+        if ($staff && Hash::check($request->password, $staff->password)) {
             Auth::guard('staff')->login($staff);
             $request->session()->regenerate();
 
             return redirect()->intended('/dashboard');
         }
+
+        Log::warning('Intento de inicio de sesión fallido', [
+            'username' => $request->username,
+            'ip' => $request->ip(),
+            'user_agent' => $request->userAgent(),
+        ]);
 
         return back()->withErrors([
             'username' => 'Usuario o contraseña incorrectos.',

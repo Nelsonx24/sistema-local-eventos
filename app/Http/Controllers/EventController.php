@@ -58,7 +58,7 @@ class EventController extends Controller
         $validated['status'] = 'Pendiente';
         $validated['payment_status'] = $validated['balance_pending'] > 0 ? 'pending' : 'paid';
         $validated['event_status'] = 'upcoming';
-        $validated['registered_by'] = Auth::user()->name;
+        $validated['registered_by'] = Auth::user()?->name ?? 'Sistema';
 
         $event = Event::create($validated);
 
@@ -199,7 +199,7 @@ class EventController extends Controller
     public function uploadContract(Request $request, Event $event)
     {
         $request->validate([
-            'contract_file' => 'file|mimes:pdf,jpg,jpeg,png|max:2048',
+            'contract_file' => ['file', 'mimetypes:application/pdf,image/jpeg,image/png', 'max:2048'],
         ]);
 
         if ($request->hasFile('contract_file')) {

@@ -21,7 +21,7 @@
     </div>
     <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm flex-1 min-w-[150px]">
         <div class="flex items-center gap-1.5 mb-1.5">
-            <div class="p-1 bg-blue-50 text-blue-600 rounded-lg">
+            <div class="p-1 bg-brand-gold/10 text-brand-gold rounded-lg">
                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/></svg>
             </div>
             <p class="text-[0.55rem] font-bold text-slate-400 uppercase tracking-widest">Facturas</p>
@@ -56,7 +56,7 @@
         </div>
         <div class="flex flex-col gap-0.5">
             <p class="text-[0.7rem] font-bold text-slate-700">Efectivo: <span class="text-emerald-600">{{ number_format($lastEventEfectivo) }} Bs</span></p>
-            <p class="text-[0.7rem] font-bold text-slate-700">QR: <span class="text-indigo-600">{{ number_format($lastEventQR) }} Bs</span></p>
+            <p class="text-[0.7rem] font-bold text-slate-700">QR: <span class="text-brand-gold-dark">{{ number_format($lastEventQR) }} Bs</span></p>
             <p class="text-[0.7rem] font-bold text-slate-700">Tarjeta: <span class="text-slate-600">{{ number_format($lastEventTarjeta) }} Bs</span></p>
         </div>
     </div>
@@ -75,7 +75,7 @@
                 <span class="text-xs font-bold text-slate-800 truncate min-w-0">{{ $pd['name'] }}</span>
                 <div class="flex gap-1.5 text-[0.65rem] shrink-0">
                     @if($pd['boxes'] > 0)<span class="text-orange-600 font-bold whitespace-nowrap">{{ $pd['boxes'] }} caja(s)</span>@endif
-                    @if($pd['units'] > 0)<span class="text-blue-600 font-bold whitespace-nowrap">{{ $pd['units'] }} unidad(es)</span>@endif
+                    @if($pd['units'] > 0)<span class="text-brand-gold font-bold whitespace-nowrap">{{ $pd['units'] }} unidad(es)</span>@endif
                 </div>
             </div>
             @empty
@@ -90,7 +90,7 @@
         </div>
         @if(count($productPercentages) > 0)
         @php
-            $colors = ['#f97316', '#3b82f6', '#10b981', '#8b5cf6', '#ec4899', '#14b8a6', '#f59e0b', '#ef4444'];
+            $colors = ['#f97316', '#D4AF37', '#10b981', '#8b5cf6', '#ec4899', '#14b8a6', '#f59e0b', '#ef4444'];
             $conic = '';
             $angle = 0;
             $legend = [];
@@ -123,6 +123,7 @@
 </div>
 @endif
 
+@if(Auth::guard('staff')->user()->role === 'Administrador')
 <div x-data="{ tab: 'eventos' }" class="flex flex-col gap-3">
     <div class="flex items-center justify-between">
         <div class="flex gap-1 bg-white rounded-lg border border-slate-200 p-0.5 shadow-sm w-fit">
@@ -135,10 +136,18 @@
         </div>
         <div x-show="tab === 'directas'" class="flex gap-1">
             <span class="px-2 py-0.5 bg-emerald-50 text-emerald-700 rounded-full text-[0.55rem] font-bold border border-emerald-200">Efectivo: {{ number_format($directSalesEfectivo) }} Bs</span>
-            <span class="px-2 py-0.5 bg-indigo-50 text-indigo-700 rounded-full text-[0.55rem] font-bold border border-indigo-200">QR: {{ number_format($directSalesQR) }} Bs</span>
+            <span class="px-2 py-0.5 bg-brand-gold/10 text-brand-gold rounded-full text-[0.55rem] font-bold border border-brand-gold/20">QR: {{ number_format($directSalesQR) }} Bs</span>
             <span class="px-2 py-0.5 bg-slate-100 text-slate-700 rounded-full text-[0.55rem] font-bold border border-slate-200">Tarjeta: {{ number_format($directSalesTarjeta) }} Bs</span>
         </div>
     </div>
+@else
+<div x-data="{ tab: 'eventos' }" class="flex flex-col gap-3">
+    <div class="flex gap-1 bg-white rounded-lg border border-slate-200 p-0.5 shadow-sm w-fit">
+        <button @click="tab = 'eventos'" :class="tab === 'eventos' ? 'bg-slate-800 text-white shadow-sm' : 'bg-white text-slate-500 hover:bg-slate-50'" class="px-4 py-1.5 rounded-md text-[0.7rem] font-bold transition-all border border-slate-200">
+            Ventas por Evento
+        </button>
+    </div>
+@endif
 
     <div x-show="tab === 'eventos'">
         <div class="overflow-x-auto">
@@ -172,7 +181,7 @@
                             <span class="text-[0.7rem] font-medium text-slate-600">{{ $event->date->format('d/m/Y') }}</span>
                         </td>
                         <td class="px-[7px] py-1.5 text-center">
-                            <span class="px-2 py-0.5 bg-blue-50 text-blue-600 text-[0.6rem] font-bold rounded-full border border-blue-100">
+                            <span class="px-2 py-0.5 bg-brand-gold/10 text-brand-gold text-[0.6rem] font-bold rounded-full border border-brand-gold/20">
                                 {{ App\Models\Sale::where('event_id', $event->id)->count() }} facturas
                             </span>
                         </td>
@@ -180,7 +189,7 @@
                             <p class="text-xs font-extrabold text-slate-900">{{ number_format($eventTotal) }} Bs</p>
                         </td>
                         <td class="px-[7px] py-1.5 text-center">
-                            <a href="{{ route('reports.show', $event->id) }}" class="w-7 h-7 rounded-full flex items-center justify-center text-slate-300 group-hover:text-brand-accent group-hover:bg-blue-50 transition-all">
+                            <a href="{{ route('reports.show', $event->id) }}" class="w-7 h-7 rounded-full flex items-center justify-center text-slate-300 group-hover:text-brand-accent group-hover:bg-brand-gold/10 transition-all">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
                             </a>
                         </td>
@@ -203,6 +212,7 @@
         @endif
     </div>
 
+    @if(Auth::guard('staff')->user()->role === 'Administrador')
     <div x-show="tab === 'directas'">
         <div class="overflow-x-auto">
             <div class="bg-white rounded-lg border border-slate-200 shadow-sm overflow-hidden">
@@ -228,7 +238,7 @@
                                 </div>
                             </td>
                             <td class="px-[7px] py-1.5 text-center">
-                                <span class="px-2 py-0.5 bg-blue-50 text-blue-600 text-[0.6rem] font-bold rounded-full border border-blue-100">
+                                <span class="px-2 py-0.5 bg-brand-gold/10 text-brand-gold text-[0.6rem] font-bold rounded-full border border-brand-gold/20">
                                     {{ $group['count'] }} factura(s)
                                 </span>
                             </td>
@@ -236,7 +246,7 @@
                                 <p class="text-xs font-extrabold text-slate-900">{{ number_format($group['total']) }} Bs</p>
                             </td>
                             <td class="px-[7px] py-1.5 text-center">
-                                <a href="{{ route('reports.direct', $dateKey) }}" class="w-7 h-7 rounded-full flex items-center justify-center text-slate-300 hover:text-brand-accent hover:bg-blue-50 transition-all">
+                                <a href="{{ route('reports.direct', $dateKey) }}" class="w-7 h-7 rounded-full flex items-center justify-center text-slate-300 hover:text-brand-accent hover:bg-brand-gold/10 transition-all">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
                                 </a>
                             </td>
@@ -253,5 +263,7 @@
             </div>
         </div>
     </div>
+    @endif
 </div>
 @endsection
+

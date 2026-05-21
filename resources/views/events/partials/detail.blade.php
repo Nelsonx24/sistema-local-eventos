@@ -26,7 +26,7 @@
     <div class="grid grid-cols-2 gap-4">
         <div>
             <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Estado del Evento</p>
-            <p class="font-bold {{ $event->event_status === 'completed' ? 'text-slate-600' : ($event->event_status === 'cancelled' ? 'text-red-600' : 'text-blue-600') }}">
+            <p class="font-bold {{ $event->event_status === 'completed' ? 'text-slate-600' : ($event->event_status === 'cancelled' ? 'text-red-600' : 'text-brand-gold') }}">
                 {{ $event->event_status === 'completed' ? 'Finalizado' : ($event->event_status === 'cancelled' ? 'Cancelado' : 'Próximo') }}
             </p>
         </div>
@@ -40,7 +40,7 @@
     <div class="grid grid-cols-2 gap-4">
         <div>
             <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Adelanto</p>
-            <p class="font-bold text-blue-600">{{ number_format($event->advance_payment) }} Bs</p>
+            <p class="font-bold text-brand-gold">{{ number_format($event->advance_payment) }} Bs</p>
         </div>
         <div>
             <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Fecha Límite de Pago</p>
@@ -48,7 +48,7 @@
         </div>
     </div>
     <div class="pt-4 border-t border-slate-100 flex gap-2">
-        <a href="{{ route('events.download-contract', $event->id) }}" target="_blank" class="flex-1 bg-blue-600 text-white py-2 rounded-lg font-bold text-center hover:bg-blue-700 transition-all">
+        <a href="{{ route('events.download-contract', $event->id) }}" target="_blank" class="flex-1 bg-brand-gold text-white py-2 rounded-lg font-bold text-center hover:bg-brand-gold-dark transition-all">
             Descargar Contrato
         </a>
         <a href="{{ route('reports.show', $event->id) }}" class="flex-1 bg-slate-800 text-white py-2 rounded-lg font-bold text-center hover:bg-slate-900 transition-all">
@@ -56,3 +56,4 @@
         </a>
     </div>
 </div>
+

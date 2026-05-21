@@ -5,16 +5,16 @@
     <title>Reporte - {{ $event->client_name }}</title>
     <style>
         body { font-family: Arial, sans-serif; margin: 30px; font-size: 10px; }
-        .header { text-align: center; margin-bottom: 20px; border-bottom: 2px solid #0f172a; padding-bottom: 15px; }
-        .header h1 { font-size: 18px; color: #0f172a; margin: 0; }
+        .header { text-align: center; margin-bottom: 20px; border-bottom: 2px solid #000000; padding-bottom: 15px; }
+        .header h1 { font-size: 18px; color: #000000; margin: 0; }
         .header p { color: #64748b; margin: 3px 0; font-size: 11px; }
         .event-info { margin-bottom: 20px; }
         .event-info td { padding: 3px 10px; font-size: 10px; }
         table { width: 100%; border-collapse: collapse; }
-        th { background: #0f172a; color: white; padding: 6px; text-align: left; font-size: 8px; text-transform: uppercase; }
+        th { background: #000000; color: white; padding: 6px; text-align: left; font-size: 8px; text-transform: uppercase; }
         td { padding: 5px 6px; border-bottom: 1px solid #e2e8f0; font-size: 9px; }
         .amount { text-align: right; font-weight: bold; }
-        .total-row td { border-top: 2px solid #0f172a; padding: 8px 6px; font-weight: bold; font-size: 11px; }
+        .total-row td { border-top: 2px solid #000000; padding: 8px 6px; font-weight: bold; font-size: 11px; }
         .footer { margin-top: 30px; text-align: center; color: #64748b; font-size: 9px; }
     </style>
 </head>
@@ -72,3 +72,4 @@
     </div>
 </body>
 </html>
+

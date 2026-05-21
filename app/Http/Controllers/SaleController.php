@@ -111,7 +111,7 @@ class SaleController extends Controller
             'date' => now()->toDateString(),
             'payment_method' => $validated['payment_method'],
             'status' => 'Paid',
-            'seller_name' => Auth::user()->name,
+            'seller_name' => Auth::user()?->name ?? 'Sistema',
             'is_printed' => false,
         ]);
 

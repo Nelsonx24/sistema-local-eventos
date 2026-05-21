@@ -10,7 +10,7 @@
     </a>
 
     <div class="flex items-center gap-4">
-        <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center">
+        <div class="w-12 h-12 bg-brand-gold/10 text-brand-gold rounded-2xl flex items-center justify-center">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
         </div>
         <div>
@@ -38,7 +38,7 @@
 
         <div class="bg-white p-8 rounded-[2.5rem] border border-slate-200 shadow-sm space-y-6 text-left">
             <div class="flex items-center gap-3">
-                <div class="p-2 bg-blue-50 text-blue-600 rounded-lg">
+                <div class="p-2 bg-brand-gold/10 text-brand-gold rounded-lg">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
                 </div>
                 <h3 class="font-bold text-slate-900">Permisos del Navegador</h3>
@@ -46,7 +46,7 @@
             <p class="text-xs text-slate-500 leading-relaxed">
                 Habilite las notificaciones en este dispositivo para recibir alertas incluso con la pestaña cerrada.
             </p>
-            <button onclick="requestNotificationPermission()" class="w-full bg-blue-600 text-white py-3 rounded-xl font-bold text-xs flex items-center justify-center gap-2 shadow-lg shadow-blue-100 group">
+            <button onclick="requestNotificationPermission()" class="w-full bg-brand-gold text-white py-3 rounded-xl font-bold text-xs flex items-center justify-center gap-2 shadow-lg shadow-brand-gold/10 group">
                 Habilitar Notificaciones
                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="group-hover:translate-x-1 transition-transform"><line x1="5" x2="12" y1="12" y2="17"/><polyline points="17 12 12 17 7 12"/></svg>
             </button>

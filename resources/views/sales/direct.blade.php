@@ -20,7 +20,7 @@
                 <p class="text-xs text-slate-500 italic">Terminal de ventas sin associação a evento</p>
             </div>
         </div>
-        <button onclick="openModal('sale-modal')" class="flex-1 md:flex-none bg-brand-accent text-white px-6 py-2 rounded-xl text-sm font-bold shadow-lg shadow-blue-200 hover:shadow-xl hover:bg-blue-600 transition-all flex items-center justify-center gap-2">
+        <button onclick="openModal('sale-modal')" class="flex-1 md:flex-none bg-brand-accent text-white px-6 py-2 rounded-xl text-sm font-bold shadow-lg shadow-brand-gold/20 hover:shadow-xl hover:bg-brand-gold transition-all flex items-center justify-center gap-2">
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
             Nueva Venta
         </button>
@@ -32,7 +32,7 @@
                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/></svg>
                 Historial de Ventas Directas
             </h4>
-            <span class="text-[0.75rem] font-bold text-brand-accent bg-blue-50 px-3 py-1 rounded-full border border-blue-100">
+            <span class="text-[0.75rem] font-bold text-brand-accent bg-brand-gold/10 px-3 py-1 rounded-full border border-brand-gold/20">
                 Total: {{ number_format($sales->sum('amount')) }} Bs
             </span>
         </div>
@@ -80,7 +80,7 @@
                             </td>
                             <td class="px-6 py-4 text-center">
                                 <div class="flex items-center justify-center gap-2">
-                                    <span class="px-2 py-1 rounded text-[10px] font-bold {{ $sale->payment_method === 'Efectivo' ? 'bg-emerald-50 text-emerald-600' : ($sale->payment_method === 'QR' ? 'bg-indigo-50 text-indigo-600' : 'bg-slate-50 text-slate-600') }}">
+                                    <span class="px-2 py-1 rounded text-[10px] font-bold {{ $sale->payment_method === 'Efectivo' ? 'bg-emerald-50 text-emerald-600' : ($sale->payment_method === 'QR' ? 'bg-brand-gold/10 text-brand-gold' : 'bg-slate-50 text-slate-600') }}">
                                         {{ $sale->payment_method }}
                                     </span>
                                     @if(Auth::guard('staff')->user()->role === 'Administrador')
@@ -143,7 +143,7 @@ setTimeout(() => {
                     <div class="flex flex-col gap-1">
                         <div class="flex items-center justify-between">
                             <label class="text-[0.65rem] font-bold text-text-muted uppercase tracking-widest">Nombre del Comprador</label>
-                            <button type="button" onclick="document.querySelector('input[name=client_name]').value='Sin Nombre'" class="text-[0.65rem] font-bold text-brand-accent uppercase tracking-widest hover:text-blue-700 transition-colors">S/N</button>
+                            <button type="button" onclick="document.querySelector('input[name=client_name]').value='Sin Nombre'" class="text-[0.65rem] font-bold text-brand-accent uppercase tracking-widest hover:text-brand-gold-dark transition-colors">S/N</button>
                         </div>
                         <div class="relative">
                             <input type="text" name="client_name" id="client-name-input" value="{{ old('client_name', 'Sin Nombre') }}" placeholder="Nombre..." autocomplete="off" required class="w-full px-3 py-2 bg-slate-50 border border-border-subtle rounded-lg text-sm outline-none focus:ring-1 focus:ring-brand-accent/30 uppercase" oninput="this.value = this.value.toUpperCase(); suggestClients(this)">
@@ -233,9 +233,9 @@ setTimeout(() => {
                         <input type="number" name="cash_received" id="cash_received" class="w-full bg-transparent text-xl font-bold text-text-main outline-none" value="0" oninput="updateChange()">
                     </div>
 
-                    <div class="flex justify-between items-center p-3 bg-blue-50/50 rounded-xl border border-blue-100">
-                        <span class="text-[0.65rem] font-bold text-blue-600 uppercase">Cambio sugerido</span>
-                        <span class="text-xl font-bold text-blue-700" id="change-display">0 Bs</span>
+                    <div class="flex justify-between items-center p-3 bg-brand-gold/10/50 rounded-xl border border-brand-gold/20">
+                        <span class="text-[0.65rem] font-bold text-brand-gold uppercase">Cambio sugerido</span>
+                        <span class="text-xl font-bold text-brand-gold-dark" id="change-display">0 Bs</span>
                     </div>
                 </div>
 

@@ -14,8 +14,10 @@
                         sans: ['Inter', 'sans-serif'],
                     },
                     colors: {
-                        'brand-primary': '#0f172a',
-                        'brand-accent': '#3b82f6',
+                        'brand-primary': '#000000',
+                        'brand-accent': '#D4AF37',
+                        'brand-gold': '#D4AF37',
+                        'brand-gold-dark': '#B8860B',
                         'surface-base': '#f8fafc',
                         'border-subtle': '#e2e8f0',
                         'text-main': '#1e293b',

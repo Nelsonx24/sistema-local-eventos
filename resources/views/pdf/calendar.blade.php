@@ -5,12 +5,12 @@
     <title>Calendario de Eventos</title>
     <style>
         body { font-family: Arial, sans-serif; margin: 30px; font-size: 10px; }
-        .header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid #0f172a; padding-bottom: 15px; }
-        .header h1 { font-size: 22px; color: #0f172a; margin: 0; }
+        .header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid #000000; padding-bottom: 15px; }
+        .header h1 { font-size: 22px; color: #000000; margin: 0; }
         .header p { color: #64748b; margin: 5px 0; }
         .subtitle { font-size: 10px; color: #94a3b8; margin-top: 5px; }
         table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th { background: #0f172a; color: white; padding: 8px 6px; text-align: left; font-size: 9px; text-transform: uppercase; }
+        th { background: #000000; color: white; padding: 8px 6px; text-align: left; font-size: 9px; text-transform: uppercase; }
         td { padding: 8px 6px; border-bottom: 1px solid #e2e8f0; }
         .status-paid { color: #10b981; font-weight: bold; }
         .status-pending { color: #f59e0b; font-weight: bold; }
@@ -71,3 +71,4 @@
     </div>
 </body>
 </html>
+

@@ -20,7 +20,7 @@
         @forelse($events as $event)
         <a href="{{ route('sales.show', $event->id) }}" class="group bg-white p-6 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md hover:border-brand-accent transition-all text-left flex items-center justify-between">
             <div class="flex items-center gap-4">
-                <div class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center text-brand-accent group-hover:bg-brand-accent group-hover:text-white transition-colors">
+                <div class="w-12 h-12 bg-brand-gold/10 rounded-xl flex items-center justify-center text-brand-accent group-hover:bg-brand-accent group-hover:text-white transition-colors">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
                 </div>
                 <div>
@@ -28,7 +28,7 @@
                     <p class="text-xs text-slate-500">{{ $event->event_type }} • {{ $event->date }}</p>
                     <div class="mt-2 flex items-center gap-2">
                         <span class="text-[10px] font-bold px-2 py-0.5 bg-slate-100 rounded-full text-slate-600 uppercase tracking-wider">{{ $event->id }}</span>
-                        <span class="text-[10px] font-bold px-2 py-0.5 bg-blue-50 text-blue-600 rounded-full uppercase tracking-wider">{{ $event->event_status === 'completed' ? 'Finalizado' : ($event->event_status === 'cancelled' ? 'Cancelado' : 'Próximo') }}</span>
+                        <span class="text-[10px] font-bold px-2 py-0.5 bg-brand-gold/10 text-brand-gold rounded-full uppercase tracking-wider">{{ $event->event_status === 'completed' ? 'Finalizado' : ($event->event_status === 'cancelled' ? 'Cancelado' : 'Próximo') }}</span>
                     </div>
                 </div>
             </div>

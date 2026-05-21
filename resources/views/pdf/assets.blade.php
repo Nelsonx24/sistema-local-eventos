@@ -5,9 +5,9 @@
     <title>Inventario de Activos</title>
     <style>
         body { font-family: Arial, sans-serif; margin: 30px; font-size: 11px; }
-        .header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid #0f172a; padding-bottom: 15px; }
-        .header h1 { font-size: 20px; color: #0f172a; margin: 0; }
-        .section-title { background: #0f172a; color: white; padding: 10px; margin-top: 25px; margin-bottom: 10px; }
+        .header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid #000000; padding-bottom: 15px; }
+        .header h1 { font-size: 20px; color: #000000; margin: 0; }
+        .section-title { background: #000000; color: white; padding: 10px; margin-top: 25px; margin-bottom: 10px; }
         table { width: 100%; border-collapse: collapse; }
         th { background: #f1f5f9; padding: 10px; text-align: left; font-size: 10px; text-transform: uppercase; color: #64748b; }
         td { padding: 10px; border-bottom: 1px solid #e2e8f0; }
