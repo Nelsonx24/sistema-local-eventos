@@ -43,8 +43,8 @@
             @foreach($items as $product)
             <tr>
                 <td>{{ $product->name }}</td>
-                <td class="text-right">Bs.{{ number_format($product->cost, 2) }}</td>
-                <td class="text-right">Bs.{{ number_format($product->sale_price, 2) }}</td>
+                <td class="text-right">Bs.{{ rtrim(rtrim(number_format($product->cost, 2), '0'), '.') }}</td>
+                <td class="text-right">Bs.{{ rtrim(rtrim(number_format($product->sale_price, 2), '0'), '.') }}</td>
                 <td class="text-center">{{ $product->stock }}</td>
                 <td>{{ $product->expiration_date ? \Carbon\Carbon::parse($product->expiration_date)->format('d/m/Y') : '—' }}</td>
             </tr>

@@ -66,13 +66,13 @@
                         <span class="inline-flex items-center px-3 py-1 bg-brand-gold/10 text-brand-gold rounded-full font-mono font-bold text-[0.8rem]">{{ $sale->quantity }}</span>
                     </td>
                     <td class="px-6 py-4 text-right">
-                        <span class="text-[0.8rem] text-text-muted font-mono">${{ number_format($sale->unit_price, 2) }}</span>
+                        <span class="text-[0.8rem] text-text-muted font-mono">Bs.{{ rtrim(rtrim(number_format($sale->unit_price, 2), '0'), '.') }}</span>
                     </td>
                     <td class="px-6 py-4 text-right">
-                        <span class="text-[0.875rem] font-bold text-text-main font-mono">${{ number_format($sale->total_amount, 2) }}</span>
+                        <span class="text-[0.875rem] font-bold text-text-main font-mono">Bs.{{ rtrim(rtrim(number_format($sale->total_amount, 2), '0'), '.') }}</span>
                     </td>
                     <td class="px-6 py-4 text-right">
-                        <span class="text-[0.8rem] font-bold text-emerald-600 font-mono">+${{ number_format($sale->profit, 2) }}</span>
+                        <span class="text-[0.8rem] font-bold text-emerald-600 font-mono">+Bs.{{ rtrim(rtrim(number_format($sale->profit, 2), '0'), '.') }}</span>
                     </td>
                 </tr>
                 @empty
@@ -112,7 +112,7 @@
                     <option value="">Seleccionar producto...</option>
                     @foreach($products as $product)
                     <option value="{{ $product->id }}" data-stock="{{ $product->stock }}">
-                        {{ $product->name }} — Stock: {{ $product->stock }} — ${{ number_format($product->sale_price, 2) }}
+                        {{ $product->name }} — Stock: {{ $product->stock }} — Bs.{{ rtrim(rtrim(number_format($product->sale_price, 2), '0'), '.') }}
                     </option>
                     @endforeach
                 </select>

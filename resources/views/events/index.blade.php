@@ -206,11 +206,11 @@
             </div>
             <div class="grid grid-cols-2 gap-4">
                 <div class="flex flex-col gap-1.5">
-                    <label class="text-[0.65rem] font-bold text-text-muted uppercase tracking-widest">Monto Total ($)</label>
+                    <label class="text-[0.65rem] font-bold text-text-muted uppercase tracking-widest">Monto Total (Bs)</label>
                     <input type="number" name="total_amount" required class="px-4 py-2 bg-slate-50 border border-border-subtle rounded-[6px] text-sm outline-none">
                 </div>
                 <div class="flex flex-col gap-1.5">
-                    <label class="text-[0.65rem] font-bold text-text-muted uppercase tracking-widest">Adelanto ($)</label>
+                    <label class="text-[0.65rem] font-bold text-text-muted uppercase tracking-widest">Adelanto (Bs)</label>
                     <input type="number" name="advance_payment" required class="px-4 py-2 bg-emerald-50 border border-emerald-100 rounded-[6px] text-sm outline-none text-emerald-800">
                 </div>
             </div>
@@ -274,11 +274,11 @@
             </div>
             <div class="grid grid-cols-2 gap-4">
                 <div class="flex flex-col gap-1.5">
-                    <label class="text-[0.65rem] font-bold text-text-muted uppercase tracking-widest">Monto Total ($)</label>
+                    <label class="text-[0.65rem] font-bold text-text-muted uppercase tracking-widest">Monto Total (Bs)</label>
                     <input type="number" name="total_amount" id="edit-total_amount" required class="px-4 py-2 bg-slate-50 border border-border-subtle rounded-[6px] text-sm outline-none">
                 </div>
                 <div class="flex flex-col gap-1.5">
-                    <label class="text-[0.65rem] font-bold text-text-muted uppercase tracking-widest">Adelanto ($)</label>
+                    <label class="text-[0.65rem] font-bold text-text-muted uppercase tracking-widest">Adelanto (Bs)</label>
                     <input type="number" name="advance_payment" id="edit-advance_payment" required class="px-4 py-2 bg-emerald-50 border border-emerald-100 rounded-[6px] text-sm outline-none text-emerald-800">
                 </div>
             </div>

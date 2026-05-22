@@ -33,9 +33,9 @@
     </div>
 
     <div class="summary">
-        <span class="efectivo">Efectivo: {{ number_format($efectivo) }} Bs</span>
-        <span class="qr">QR: {{ number_format($qr) }} Bs</span>
-        <span class="tarjeta">Tarjeta: {{ number_format($tarjeta) }} Bs</span>
+        <span class="efectivo">Efectivo: {{ rtrim(rtrim(number_format($efectivo, 2), '0'), '.') }} Bs</span>
+        <span class="qr">QR: {{ rtrim(rtrim(number_format($qr, 2), '0'), '.') }} Bs</span>
+        <span class="tarjeta">Tarjeta: {{ rtrim(rtrim(number_format($tarjeta, 2), '0'), '.') }} Bs</span>
     </div>
 
     <table>
@@ -65,7 +65,7 @@
                     <span class="item-badge">{{ $item->quantity }} {{ $item->type }}x {{ $item->name }}</span>
                 @endforeach
                 </td>
-                <td class="text-right">{{ number_format($sale->amount) }} Bs</td>
+                <td class="text-right">{{ rtrim(rtrim(number_format($sale->amount, 2), '0'), '.') }} Bs</td>
                 <td class="text-center">{{ $sale->created_at->format('H:i') }}</td>
             </tr>
             @endforeach
@@ -78,7 +78,7 @@
         <tfoot>
             <tr class="total-row">
                 <td colspan="4" style="text-align:right;">TOTAL DEL DÍA:</td>
-                <td class="text-right">{{ number_format($total) }} Bs</td>
+                <td class="text-right">{{ rtrim(rtrim(number_format($total, 2), '0'), '.') }} Bs</td>
                 <td></td>
             </tr>
         </tfoot>

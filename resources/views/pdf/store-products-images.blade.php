@@ -37,7 +37,7 @@
             <div class="no-img">—</div>
             @endif
             <div class="name">{{ $product->name }}</div>
-            <div class="price">Bs.{{ number_format($product->sale_price, 2) }}</div>
+            <div class="price">Bs.{{ rtrim(rtrim(number_format($product->sale_price, 2), '0'), '.') }}</div>
             @if($product->detail)
             <div class="stock">{{ $product->detail }}</div>
             @endif

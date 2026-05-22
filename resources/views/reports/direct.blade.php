@@ -15,9 +15,9 @@
                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
                 Descargar PDF
             </a>
-            <span class="px-3 py-1 bg-emerald-50 text-emerald-700 rounded-full text-[0.65rem] font-bold border border-emerald-200">Efectivo: {{ number_format($efectivo) }} Bs</span>
-            <span class="px-3 py-1 bg-indigo-50 text-indigo-700 rounded-full text-[0.65rem] font-bold border border-indigo-200">QR: {{ number_format($qr) }} Bs</span>
-            <span class="px-3 py-1 bg-slate-100 text-slate-700 rounded-full text-[0.65rem] font-bold border border-slate-200">Tarjeta: {{ number_format($tarjeta) }} Bs</span>
+            <span class="px-3 py-1 bg-emerald-50 text-emerald-700 rounded-full text-[0.65rem] font-bold border border-emerald-200">Efectivo: {{ rtrim(rtrim(number_format($efectivo, 2), '0'), '.') }} Bs</span>
+            <span class="px-3 py-1 bg-indigo-50 text-indigo-700 rounded-full text-[0.65rem] font-bold border border-indigo-200">QR: {{ rtrim(rtrim(number_format($qr, 2), '0'), '.') }} Bs</span>
+            <span class="px-3 py-1 bg-slate-100 text-slate-700 rounded-full text-[0.65rem] font-bold border border-slate-200">Tarjeta: {{ rtrim(rtrim(number_format($tarjeta, 2), '0'), '.') }} Bs</span>
         </div>
     </div>
 
@@ -28,7 +28,7 @@
             </div>
             <h2 class="text-xl font-black text-slate-900">{{ $displayDate }}</h2>
         </div>
-        <p class="text-2xl font-black text-brand-accent">{{ number_format($total) }} Bs</p>
+        <p class="text-2xl font-black text-brand-accent">{{ rtrim(rtrim(number_format($total, 2), '0'), '.') }} Bs</p>
     </div>
 
     <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
@@ -67,7 +67,7 @@
                             @endforeach
                         </div>
                     </td>
-                    <td class="px-6 py-4 text-right text-sm font-extrabold text-slate-900">{{ number_format($sale->amount) }} Bs</td>
+                    <td class="px-6 py-4 text-right text-sm font-extrabold text-slate-900">{{ rtrim(rtrim(number_format($sale->amount, 2), '0'), '.') }} Bs</td>
                     <td class="px-6 py-4 text-center text-xs text-slate-500">{{ $sale->created_at->format('H:i') }}</td>
                 </tr>
                 @empty
@@ -79,7 +79,7 @@
             <tfoot class="bg-slate-900 text-white">
                 <tr>
                     <td colspan="5" class="px-6 py-5 text-right font-bold text-xs uppercase tracking-widest opacity-60">Total del día</td>
-                    <td class="px-6 py-5 text-right font-black text-xl">{{ number_format($total) }} Bs</td>
+                    <td class="px-6 py-5 text-right font-black text-xl">{{ rtrim(rtrim(number_format($total, 2), '0'), '.') }} Bs</td>
                 </tr>
             </tfoot>
         </table>

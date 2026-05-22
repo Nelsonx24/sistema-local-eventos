@@ -34,7 +34,7 @@
                 <div>
                     <label class="block text-[0.75rem] font-bold text-text-muted uppercase tracking-widest mb-2">Costo</label>
                     <div class="relative">
-                        <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-text-muted font-bold text-[0.875rem]">$</span>
+                        <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-text-muted font-bold text-[0.875rem]">Bs.</span>
                         <input type="number" step="0.01" min="0" name="cost" value="{{ old('cost') }}" required
                             class="w-full pl-8 pr-4 py-3 bg-white border border-border-subtle rounded-xl text-[0.875rem] text-text-main placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-brand-gold/40 focus:border-brand-accent transition-all">
                     </div>
@@ -43,7 +43,7 @@
                 <div>
                     <label class="block text-[0.75rem] font-bold text-text-muted uppercase tracking-widest mb-2">Precio de Venta</label>
                     <div class="relative">
-                        <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-text-muted font-bold text-[0.875rem]">$</span>
+                        <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-text-muted font-bold text-[0.875rem]">Bs.</span>
                         <input type="number" step="0.01" min="0" name="sale_price" value="{{ old('sale_price') }}" required
                             class="w-full pl-8 pr-4 py-3 bg-white border border-border-subtle rounded-xl text-[0.875rem] text-text-main placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-brand-gold/40 focus:border-brand-accent transition-all">
                     </div>

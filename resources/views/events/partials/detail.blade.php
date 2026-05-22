@@ -40,7 +40,7 @@
     <div class="grid grid-cols-2 gap-4">
         <div>
             <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Adelanto</p>
-            <p class="font-bold text-brand-gold">{{ number_format($event->advance_payment) }} Bs</p>
+            <p class="font-bold text-brand-gold">{{ rtrim(rtrim(number_format($event->advance_payment, 2), '0'), '.') }} Bs</p>
         </div>
         <div>
             <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Fecha Límite de Pago</p>

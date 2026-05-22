@@ -50,8 +50,8 @@
                 <td>{{ $event->client_name }}</td>
                 <td>{{ $event->client_phone ?? '—' }}</td>
                 <td>{{ $event->event_type }}</td>
-                <td class="amount">{{ number_format($event->total_amount) }} Bs</td>
-                <td class="balance">{{ number_format($event->balance_pending) }} Bs</td>
+<td class="amount">{{ rtrim(rtrim(number_format($event->total_amount, 2), '0'), '.') }} Bs</td>
+                <td class="balance">{{ rtrim(rtrim(number_format($event->balance_pending, 2), '0'), '.') }} Bs</td>
                 <td>
                     @if($event->event_status === 'completed')
                     <span style="color:#64748b;font-weight:bold;">Finalizado</span>
@@ -82,8 +82,8 @@
         <tfoot>
             <tr class="total-row">
                 <td colspan="4" style="text-align: right;">TOTALES:</td>
-                <td class="amount">{{ number_format($events->sum('total_amount')) }} Bs</td>
-                <td class="balance">{{ number_format($events->sum('balance_pending')) }} Bs</td>
+<td class="amount">{{ rtrim(rtrim(number_format($events->sum('total_amount'), 2), '0'), '.') }} Bs</td>
+                <td class="balance">{{ rtrim(rtrim(number_format($events->sum('balance_pending'), 2), '0'), '.') }} Bs</td>
                 <td colspan="2"></td>
             </tr>
         </tfoot>

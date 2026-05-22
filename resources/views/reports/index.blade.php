@@ -35,7 +35,7 @@
             </div>
             <p class="text-[0.55rem] font-bold text-slate-400 uppercase tracking-widest">Venta Más Alta</p>
         </div>
-        <p class="text-xl font-extrabold text-slate-900">{{ number_format($lastEventBiggestSale) }} Bs</p>
+        <p class="text-xl font-extrabold text-slate-900">{{ rtrim(rtrim(number_format($lastEventBiggestSale, 2), '0'), '.') }} Bs</p>
         <p class="text-[0.55rem] text-slate-400">{{ $lastEventBiggestSaleClient }}</p>
     </div>
     <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm flex-1 min-w-[150px]">
@@ -45,7 +45,7 @@
             </div>
             <p class="text-[0.55rem] font-bold text-slate-400 uppercase tracking-widest">Total Evento</p>
         </div>
-        <p class="text-xl font-extrabold text-brand-accent">{{ number_format($lastEventSales->sum('amount')) }} Bs</p>
+        <p class="text-xl font-extrabold text-brand-accent">{{ rtrim(rtrim(number_format($lastEventSales->sum('amount'), 2), '0'), '.') }} Bs</p>
     </div>
     <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm flex-1 min-w-[150px]">
         <div class="flex items-center gap-1.5 mb-1.5">
@@ -55,9 +55,9 @@
             <p class="text-[0.55rem] font-bold text-slate-400 uppercase tracking-widest">Métodos de Pago</p>
         </div>
         <div class="flex flex-col gap-0.5">
-            <p class="text-[0.7rem] font-bold text-slate-700">Efectivo: <span class="text-emerald-600">{{ number_format($lastEventEfectivo) }} Bs</span></p>
-            <p class="text-[0.7rem] font-bold text-slate-700">QR: <span class="text-brand-gold-dark">{{ number_format($lastEventQR) }} Bs</span></p>
-            <p class="text-[0.7rem] font-bold text-slate-700">Tarjeta: <span class="text-slate-600">{{ number_format($lastEventTarjeta) }} Bs</span></p>
+            <p class="text-[0.7rem] font-bold text-slate-700">Efectivo: <span class="text-emerald-600">{{ rtrim(rtrim(number_format($lastEventEfectivo, 2), '0'), '.') }} Bs</span></p>
+            <p class="text-[0.7rem] font-bold text-slate-700">QR: <span class="text-brand-gold-dark">{{ rtrim(rtrim(number_format($lastEventQR, 2), '0'), '.') }} Bs</span></p>
+            <p class="text-[0.7rem] font-bold text-slate-700">Tarjeta: <span class="text-slate-600">{{ rtrim(rtrim(number_format($lastEventTarjeta, 2), '0'), '.') }} Bs</span></p>
         </div>
     </div>
 </div>
@@ -135,9 +135,9 @@
             </button>
         </div>
         <div x-show="tab === 'directas'" class="flex gap-1">
-            <span class="px-2 py-0.5 bg-emerald-50 text-emerald-700 rounded-full text-[0.55rem] font-bold border border-emerald-200">Efectivo: {{ number_format($directSalesEfectivo) }} Bs</span>
-            <span class="px-2 py-0.5 bg-brand-gold/10 text-brand-gold rounded-full text-[0.55rem] font-bold border border-brand-gold/20">QR: {{ number_format($directSalesQR) }} Bs</span>
-            <span class="px-2 py-0.5 bg-slate-100 text-slate-700 rounded-full text-[0.55rem] font-bold border border-slate-200">Tarjeta: {{ number_format($directSalesTarjeta) }} Bs</span>
+            <span class="px-2 py-0.5 bg-emerald-50 text-emerald-700 rounded-full text-[0.55rem] font-bold border border-emerald-200">Efectivo: {{ rtrim(rtrim(number_format($directSalesEfectivo, 2), '0'), '.') }} Bs</span>
+            <span class="px-2 py-0.5 bg-brand-gold/10 text-brand-gold rounded-full text-[0.55rem] font-bold border border-brand-gold/20">QR: {{ rtrim(rtrim(number_format($directSalesQR, 2), '0'), '.') }} Bs</span>
+            <span class="px-2 py-0.5 bg-slate-100 text-slate-700 rounded-full text-[0.55rem] font-bold border border-slate-200">Tarjeta: {{ rtrim(rtrim(number_format($directSalesTarjeta, 2), '0'), '.') }} Bs</span>
         </div>
     </div>
 @else
@@ -185,7 +185,7 @@
                             </span>
                         </td>
                         <td class="px-[7px] py-1.5 text-right">
-                            <p class="text-xs font-extrabold text-slate-900">{{ number_format($event->event_total) }} Bs</p>
+                            <p class="text-xs font-extrabold text-slate-900">{{ rtrim(rtrim(number_format($event->event_total, 2), '0'), '.') }} Bs</p>
                         </td>
                         <td class="px-[7px] py-1.5 text-center">
                             <a href="{{ route('reports.show', $event->id) }}" class="w-7 h-7 rounded-full flex items-center justify-center text-slate-300 group-hover:text-brand-accent group-hover:bg-brand-gold/10 transition-all">
@@ -242,7 +242,7 @@
                                 </span>
                             </td>
                             <td class="px-[7px] py-1.5 text-right">
-                                <p class="text-xs font-extrabold text-slate-900">{{ number_format($group['total']) }} Bs</p>
+                                <p class="text-xs font-extrabold text-slate-900">{{ rtrim(rtrim(number_format($group['total'], 2), '0'), '.') }} Bs</p>
                             </td>
                             <td class="px-[7px] py-1.5 text-center">
                                 <a href="{{ route('reports.direct', $dateKey) }}" class="w-7 h-7 rounded-full flex items-center justify-center text-slate-300 hover:text-brand-accent hover:bg-brand-gold/10 transition-all">

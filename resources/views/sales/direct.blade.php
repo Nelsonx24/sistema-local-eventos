@@ -33,7 +33,7 @@
                 Historial de Ventas Directas
             </h4>
             <span class="text-[0.75rem] font-bold text-brand-accent bg-brand-gold/10 px-3 py-1 rounded-full border border-brand-gold/20">
-                Total: {{ number_format($sales->sum('amount')) }} Bs
+                Total: {{ rtrim(rtrim(number_format($sales->sum('amount'), 2), '0'), '.') }} Bs
             </span>
         </div>
 
@@ -73,9 +73,9 @@
                                 </div>
                             </td>
                             <td class="px-6 py-4 text-right">
-                                <p class="text-sm font-bold text-slate-900">{{ number_format($sale->amount) }} Bs</p>
+                                <p class="text-sm font-bold text-slate-900">{{ rtrim(rtrim(number_format($sale->amount, 2), '0'), '.') }} Bs</p>
                                 @if($sale->change_given > 0)
-                                <p class="text-[10px] text-emerald-600">Vuelto: {{ number_format($sale->change_given) }} Bs</p>
+                                <p class="text-[10px] text-emerald-600">Vuelto: {{ rtrim(rtrim(number_format($sale->change_given, 2), '0'), '.') }} Bs</p>
                                 @endif
                             </td>
                             <td class="px-6 py-4 text-center">
@@ -248,15 +248,21 @@ setTimeout(() => {
 </div>
 
 <script>
+function fmt(n) {
+    return parseFloat(n.toFixed(2)).toString();
+}
+
 let cart = [];
 
 const clientNames = @json($clientNames);
 
 function suggestClients(input) {
     const container = document.getElementById('client-suggestions');
-    const val = input.value.trim();
-    if (val.length < 2) { container.classList.add('hidden'); return; }
-    const filtered = clientNames.filter(n => n.includes(val));
+    const val = input.value;
+    const lastSpace = val.lastIndexOf(' ');
+    const searchTerm = lastSpace >= 0 ? val.substring(lastSpace + 1) : '';
+    if (searchTerm.length < 2) { container.classList.add('hidden'); return; }
+    const filtered = clientNames.filter(n => n.toUpperCase().includes(searchTerm.toUpperCase()));
     if (filtered.length === 0) { container.classList.add('hidden'); return; }
     container.innerHTML = filtered.map(n =>
         `<div class="px-3 py-2 text-sm font-medium text-slate-700 hover:bg-brand-accent/10 hover:text-brand-accent cursor-pointer transition-colors uppercase" data-name="${n.replace(/"/g, '&quot;')}">${n}</div>`
@@ -401,7 +407,7 @@ function renderCart() {
                         <p class="text-[0.65rem] text-text-muted font-medium">${it.quantity} ${it.type}(s)</p>
                     </div>
                     <div class="flex items-center gap-3">
-                        <span class="text-[0.8rem] font-bold text-brand-accent">${it.subtotal.toLocaleString()} Bs</span>
+                        <span class="text-[0.8rem] font-bold text-brand-accent">${fmt(it.subtotal)} Bs</span>
                         <button onclick="removeFromCart(${idx})" class="text-red-300 hover:text-red-500 transition-colors">
                             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
                         </button>
@@ -423,13 +429,13 @@ function removeFromCart(idx) {
 
 function updateTotal() {
     const total = cart.reduce((acc, curr) => acc + curr.subtotal, 0);
-    document.getElementById('total-display').textContent = total.toLocaleString() + ' Bs';
+    document.getElementById('total-display').textContent = fmt(total) + ' Bs';
     
     document.getElementById('cash_received').value = total;
     
     const cash = parseFloat(document.getElementById('cash_received').value) || 0;
     const change = cash > total ? cash - total : 0;
-    document.getElementById('change-display').textContent = change.toLocaleString() + ' Bs';
+    document.getElementById('change-display').textContent = fmt(change) + ' Bs';
     
     const submitBtn = document.getElementById('submit-btn');
     const method = document.getElementById('payment_method').value;
@@ -440,7 +446,7 @@ function updateChange() {
     const total = cart.reduce((acc, curr) => acc + curr.subtotal, 0);
     const cash = parseFloat(document.getElementById('cash_received').value) || 0;
     const change = cash > total ? cash - total : 0;
-    document.getElementById('change-display').textContent = change.toLocaleString() + ' Bs';
+    document.getElementById('change-display').textContent = fmt(change) + ' Bs';
     updateTotal();
 }
 

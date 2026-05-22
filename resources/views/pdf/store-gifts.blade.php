@@ -42,8 +42,8 @@
             @foreach($items as $gift)
             <tr>
                 <td>{{ $gift->name }}</td>
-                <td class="text-right">Bs.{{ number_format($gift->cost, 2) }}</td>
-                <td class="text-right">Bs.{{ number_format($gift->sale_price, 2) }}</td>
+                <td class="text-right">Bs.{{ rtrim(rtrim(number_format($gift->cost, 2), '0'), '.') }}</td>
+                <td class="text-right">Bs.{{ rtrim(rtrim(number_format($gift->sale_price, 2), '0'), '.') }}</td>
                 <td class="text-center">{{ $gift->stock }}</td>
             </tr>
             @endforeach

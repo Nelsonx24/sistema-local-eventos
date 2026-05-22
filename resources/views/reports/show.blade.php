@@ -33,7 +33,7 @@
             </div>
             <div class="text-right">
                 <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Recaudación Total</p>
-                <p class="text-3xl font-black text-brand-accent tracking-tighter">{{ number_format($totalAmount) }} <span class="text-lg">Bs</span></p>
+                <p class="text-3xl font-black text-brand-accent tracking-tighter">{{ rtrim(rtrim(number_format($totalAmount, 2), '0'), '.') }} <span class="text-lg">Bs</span></p>
             </div>
         </div>
     </div>
@@ -79,7 +79,7 @@
                             </div>
                         </td>
                         <td class="px-3 py-2 text-right">
-                            <span class="font-extrabold text-slate-900 text-xs">{{ number_format($sale->amount) }} Bs</span>
+                            <span class="font-extrabold text-slate-900 text-xs">{{ rtrim(rtrim(number_format($sale->amount, 2), '0'), '.') }} Bs</span>
                         </td>
                     </tr>
                     @empty
@@ -93,7 +93,7 @@
                 <tfoot class="bg-slate-900 text-white">
                     <tr>
                         <td colspan="4" class="px-3 py-3 text-right font-bold text-[10px] uppercase tracking-widest opacity-60">Total del Evento</td>
-                        <td class="px-3 py-3 text-right font-black text-base">{{ number_format($totalAmount) }} Bs</td>
+                        <td class="px-3 py-3 text-right font-black text-base">{{ rtrim(rtrim(number_format($totalAmount, 2), '0'), '.') }} Bs</td>
                     </tr>
                 </tfoot>
             </table>

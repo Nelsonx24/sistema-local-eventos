@@ -45,8 +45,8 @@
                 <td>{{ $event->client_name }}</td>
                 <td>{{ $event->client_phone ?? '—' }}</td>
                 <td>{{ $event->event_type }}</td>
-                <td class="amount">{{ number_format($event->total_amount) }} Bs</td>
-                <td class="balance">{{ number_format($event->balance_pending) }} Bs</td>
+<td class="amount">{{ rtrim(rtrim(number_format($event->total_amount, 2), '0'), '.') }} Bs</td>
+                <td class="balance">{{ rtrim(rtrim(number_format($event->balance_pending, 2), '0'), '.') }} Bs</td>
                 <td>
                     @if($event->payment_status === 'paid')
                     <span class="status-paid">Pagado</span>

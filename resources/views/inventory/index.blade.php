@@ -77,8 +77,8 @@
                     </td>
                     <td class="px-6 py-4">
                         <div class="flex flex-col">
-                            <span class="text-[0.8rem] font-bold text-text-main">${{ rtrim(rtrim(number_format($item->price_per_box, 2), '0'), '.') }} <small class="text-text-muted font-normal">/caja</small></span>
-                            <span class="text-[0.8rem] font-bold text-brand-accent">${{ rtrim(rtrim(number_format($item->price_per_unit, 2), '0'), '.') }} <small class="text-text-muted font-normal">/unidad</small></span>
+                            <span class="text-[0.8rem] font-bold text-text-main">Bs {{ rtrim(rtrim(number_format($item->price_per_box, 2), '0'), '.') }} <small class="text-text-muted font-normal">/caja</small></span>
+                            <span class="text-[0.8rem] font-bold text-brand-accent">Bs {{ rtrim(rtrim(number_format($item->price_per_unit, 2), '0'), '.') }} <small class="text-text-muted font-normal">/unidad</small></span>
                         </div>
                     </td>
                     <td class="px-6 py-4">
@@ -155,11 +155,11 @@
             </div>
             <div class="grid grid-cols-2 gap-4 text-left">
                 <div class="flex flex-col gap-1.5">
-                    <label class="text-[0.65rem] font-bold text-text-muted uppercase">Precio Caja ($)</label>
-                    <input type="number" step="any" name="price_per_box" required class="px-4 py-2 bg-slate-50 border border-border-subtle rounded-lg text-sm">
+                    <label class="text-[0.65rem] font-bold text-text-muted uppercase">Precio Caja (Bs)</label>
+                    <input type="number" step="any" name="price_per_box" required id="edit-price-box" class="px-4 py-2 bg-slate-50 border border-border-subtle rounded-lg text-sm">
                 </div>
                 <div class="flex flex-col gap-1.5">
-                    <label class="text-[0.65rem] font-bold text-text-muted uppercase">Precio Unidad ($)</label>
+                    <label class="text-[0.65rem] font-bold text-text-muted uppercase">Precio Unidad (Bs)</label>
                     <input type="number" step="any" name="price_per_unit" required class="px-4 py-2 bg-slate-50 border border-border-subtle rounded-lg text-sm">
                 </div>
             </div>
@@ -237,11 +237,11 @@
             </div>
             <div class="grid grid-cols-2 gap-4">
                 <div class="flex flex-col gap-1.5">
-                    <label class="text-[0.65rem] font-bold text-text-muted uppercase">Precio Caja ($)</label>
+                    <label class="text-[0.65rem] font-bold text-text-muted uppercase">Precio Caja (Bs)</label>
                     <input type="number" step="any" name="price_per_box" required class="px-4 py-2 bg-slate-50 border border-border-subtle rounded-lg text-sm">
                 </div>
                 <div class="flex flex-col gap-1.5">
-                    <label class="text-[0.65rem] font-bold text-text-muted uppercase">Precio Unidad ($)</label>
+                    <label class="text-[0.65rem] font-bold text-text-muted uppercase">Precio Unidad (Bs)</label>
                     <input type="number" step="any" name="price_per_unit" required class="px-4 py-2 bg-slate-50 border border-border-subtle rounded-lg text-sm">
                 </div>
             </div>
@@ -389,11 +389,11 @@
             </div>
             <div class="grid grid-cols-2 gap-4 text-left">
                 <div class="flex flex-col gap-1.5">
-                    <label class="text-[0.65rem] font-bold text-text-muted uppercase">Precio Caja ($)</label>
-                    <input type="number" step="any" name="price_per_box" required id="edit-price-box" class="px-4 py-2 bg-slate-50 border border-border-subtle rounded-lg text-sm">
+                    <label class="text-[0.65rem] font-bold text-text-muted uppercase">Precio Caja (Bs)</label>
+                    <input type="number" step="any" name="price_per_box" required class="px-4 py-2 bg-slate-50 border border-border-subtle rounded-lg text-sm">
                 </div>
                 <div class="flex flex-col gap-1.5">
-                    <label class="text-[0.65rem] font-bold text-text-muted uppercase">Precio Unidad ($)</label>
+                    <label class="text-[0.65rem] font-bold text-text-muted uppercase">Precio Unidad (Bs)</label>
                     <input type="number" step="any" name="price_per_unit" required id="edit-price-unit" class="px-4 py-2 bg-slate-50 border border-border-subtle rounded-lg text-sm">
                 </div>
             </div>
@@ -437,8 +437,8 @@ function viewItem(id) {
     document.getElementById('view-loose').textContent = row.dataset.loose;
     document.getElementById('view-units-per-box').textContent = row.dataset.unitsPerBox;
     document.getElementById('view-total-units').textContent = row.dataset.totalUnits;
-    document.getElementById('view-price-box').textContent = '$' + parseFloat(row.dataset.priceBox);
-    document.getElementById('view-price-unit').textContent = '$' + parseFloat(row.dataset.priceUnit);
+    document.getElementById('view-price-box').textContent = 'Bs ' + parseFloat(row.dataset.priceBox);
+    document.getElementById('view-price-unit').textContent = 'Bs ' + parseFloat(row.dataset.priceUnit);
 
     ['box', 'unit'].forEach(type => {
         const img = document.getElementById('view-image-' + type);

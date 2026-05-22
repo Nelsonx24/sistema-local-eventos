@@ -61,10 +61,10 @@
 
     <div class="section">
         <p class="section-title">CUARTA: PRECIO Y FORMA DE PAGO</p>
-        <p>El costo total del servicio es de <strong>Bs. {{ number_format($event->total_amount) }}</strong>.</p>
+        <p>El costo total del servicio es de <strong>Bs. {{ rtrim(rtrim(number_format($event->total_amount, 2), '0'), '.') }}</strong>.</p>
         <p>Forma de pago:</p>
         <ul>
-            <li>Anticipo: <strong>Bs. {{ number_format($event->advance_payment) }}</strong> al momento de la firma del contrato</li>
+            <li>Anticipo: <strong>Bs. {{ rtrim(rtrim(number_format($event->advance_payment, 2), '0'), '.') }}</strong> al momento de la firma del contrato</li>
             <li>Saldo restante: deberá ser cancelado hasta <strong>{{ \Carbon\Carbon::parse($event->payment_due_date)->format('d/m/Y') }}</strong></li>
         </ul>
         <p>El incumplimiento de pago dentro del plazo establecido podrá generar la suspensión del servicio sin derecho a reclamo.</p>

@@ -102,10 +102,10 @@
                                 <span class="text-[0.7rem] text-text-muted">{{ $product->category }}</span>
                             </td>
                             <td class="px-6 py-4 text-right">
-                                <span class="text-[0.75rem] text-text-muted font-mono font-bold">Bs.{{ number_format($product->cost, 2) }}</span>
+                                <span class="text-[0.75rem] text-text-muted font-mono font-bold">Bs.{{ rtrim(rtrim(number_format($product->cost, 2), '0'), '.') }}</span>
                             </td>
                             <td class="px-6 py-4 text-right">
-                                <span class="text-[0.75rem] font-bold text-brand-accent font-mono">Bs.{{ number_format($product->sale_price, 2) }}</span>
+                                <span class="text-[0.75rem] font-bold text-brand-accent font-mono">Bs.{{ rtrim(rtrim(number_format($product->sale_price, 2), '0'), '.') }}</span>
                             </td>
                             <td class="px-6 py-4 text-center">
                                 @if($product->stock > 5)
@@ -190,8 +190,8 @@
                         <p class="text-[0.65rem] text-text-muted">{{ \Carbon\Carbon::parse($sale->date)->format('d/m/Y') }} · {{ $sale->quantity }} uni.</p>
                     </div>
                     <div class="text-right">
-                        <p class="text-[0.8rem] font-bold text-text-main font-mono">Bs.{{ number_format($sale->total_amount, 2) }}</p>
-                        <p class="text-[0.65rem] font-bold text-emerald-600 font-mono">+Bs.{{ number_format($sale->profit, 2) }}</p>
+                        <p class="text-[0.8rem] font-bold text-text-main font-mono">Bs.{{ rtrim(rtrim(number_format($sale->total_amount, 2), '0'), '.') }}</p>
+                        <p class="text-[0.65rem] font-bold text-emerald-600 font-mono">+Bs.{{ rtrim(rtrim(number_format($sale->profit, 2), '0'), '.') }}</p>
                     </div>
                 </div>
                 @endforeach
@@ -372,6 +372,10 @@
 </div>
 
 <script>
+function fmt(n) {
+    return parseFloat(n.toFixed(2)).toString();
+}
+
 function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
 function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
 function showDetail(id, type) {
@@ -385,11 +389,11 @@ function showDetail(id, type) {
             if (data.detail) html += '<div class=\"flex justify-between py-2 border-b border-border-subtle\"><span class=\"font-bold text-text-muted\">Detalle</span><span class=\"text-text-main text-right\">' + data.detail + '</span></div>';
             if (data.barcode) html += '<div class=\"flex justify-between py-2 border-b border-border-subtle\"><span class=\"font-bold text-text-muted\">Código de Barras</span><span class=\"text-text-main text-right font-mono\">' + data.barcode + '</span></div>';
             html += '<div class=\"flex justify-between py-2 border-b border-border-subtle\"><span class=\"font-bold text-text-muted\">Categoría</span><span class=\"text-text-main text-right\">' + (data.category || '—') + '</span></div>';
-            html += '<div class=\"flex justify-between py-2 border-b border-border-subtle\"><span class=\"font-bold text-text-muted\">Costo</span><span class=\"text-text-main text-right font-mono\">Bs.' + parseFloat(data.cost).toFixed(2) + '</span></div>';
-            html += '<div class=\"flex justify-between py-2 border-b border-border-subtle\"><span class=\"font-bold text-text-muted\">Precio de Venta</span><span class=\"text-text-main text-right font-mono font-bold text-brand-accent\">Bs.' + parseFloat(data.sale_price).toFixed(2) + '</span></div>';
+            html += '<div class=\"flex justify-between py-2 border-b border-border-subtle\"><span class=\"font-bold text-text-muted\">Costo</span><span class=\"text-text-main text-right font-mono\">Bs.' + fmt(data.cost) + '</span></div>';
+            html += '<div class=\"flex justify-between py-2 border-b border-border-subtle\"><span class=\"font-bold text-text-muted\">Precio de Venta</span><span class=\"text-text-main text-right font-mono font-bold text-brand-accent\">Bs.' + fmt(data.sale_price) + '</span></div>';
             var profit = data.sale_price - data.cost;
             var profitPct = data.cost > 0 ? ((profit / data.cost) * 100).toFixed(1) : 0;
-            html += '<div class=\"flex justify-between py-2 border-b border-border-subtle\"><span class=\"font-bold text-text-muted\">Ganancia</span><span class=\"text-text-main text-right font-mono\">Bs.' + profit.toFixed(2) + ' (' + profitPct + '%)</span></div>';
+            html += '<div class=\"flex justify-between py-2 border-b border-border-subtle\"><span class=\"font-bold text-text-muted\">Ganancia</span><span class=\"text-text-main text-right font-mono\">Bs.' + fmt(profit) + ' (' + profitPct + '%)</span></div>';
             html += '<div class=\"flex justify-between py-2\"><span class=\"font-bold text-text-muted\">Stock</span><span class=\"text-text-main text-right font-mono font-bold\">' + data.stock + '</span></div>';
             if (data.expiration_date) {
                 html += '<div class=\"flex justify-between py-2 border-t border-border-subtle\"><span class=\"font-bold text-text-muted\">Fecha de Caducidad</span><span class=\"text-text-main text-right\">' + new Date(data.expiration_date).toLocaleDateString('es-MX') + '</span></div>';

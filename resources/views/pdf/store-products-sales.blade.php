@@ -36,9 +36,9 @@
             <tr>
                 <td>{{ $sale->product->name }}</td>
                 <td class="text-center">{{ $sale->quantity }}</td>
-                <td class="text-right">Bs.{{ number_format($sale->unit_price, 2) }}</td>
-                <td class="text-right">Bs.{{ number_format($sale->total_amount, 2) }}</td>
-                <td class="text-right">Bs.{{ number_format($sale->profit, 2) }}</td>
+                <td class="text-right">Bs.{{ rtrim(rtrim(number_format($sale->unit_price, 2), '0'), '.') }}</td>
+                <td class="text-right">Bs.{{ rtrim(rtrim(number_format($sale->total_amount, 2), '0'), '.') }}</td>
+                <td class="text-right">Bs.{{ rtrim(rtrim(number_format($sale->profit, 2), '0'), '.') }}</td>
                 <td>{{ \Carbon\Carbon::parse($sale->date)->format('d/m/Y') }}</td>
             </tr>
             @empty
@@ -51,7 +51,7 @@
     $totalVentas = $sales->sum('total_amount');
     $totalGanancias = $sales->sum('profit');
     @endphp
-    <p class="total">Total Ventas: Bs.{{ number_format($totalVentas, 2) }} | Ganancia Total: Bs.{{ number_format($totalGanancias, 2) }}</p>
+    <p class="total">Total Ventas: Bs.{{ rtrim(rtrim(number_format($totalVentas, 2), '0'), '.') }} | Ganancia Total: Bs.{{ rtrim(rtrim(number_format($totalGanancias, 2), '0'), '.') }}</p>
 
     <div class="footer">
         Gran Cañaveral &copy; {{ date('Y') }}

@@ -49,7 +49,7 @@
                     <div>{{ $item->quantity }} {{ $item->type }}x {{ $item->name }}</div>
                     @endforeach
                 </td>
-                <td class="amount">{{ number_format($sale->amount) }} Bs</td>
+                <td class="amount">{{ rtrim(rtrim(number_format($sale->amount, 2), '0'), '.') }} Bs</td>
             </tr>
             @empty
             <tr>
@@ -61,7 +61,7 @@
         <tfoot>
             <tr class="total-row">
                 <td colspan="5" style="text-align:right;">TOTAL:</td>
-                <td class="amount">{{ number_format($totalAmount) }} Bs</td>
+                <td class="amount">{{ rtrim(rtrim(number_format($totalAmount, 2), '0'), '.') }} Bs</td>
             </tr>
         </tfoot>
         @endif
