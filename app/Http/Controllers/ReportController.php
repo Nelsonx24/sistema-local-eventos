@@ -11,20 +11,29 @@ class ReportController extends Controller
 {
     public function index()
     {
-        $allClosedEvents = Event::where('event_status', 'completed')->orderBy('date', 'desc')->get();
-        $closedEvents = Event::where('event_status', 'completed')->orderBy('date', 'desc')->paginate(4);
+        $allClosedEvents = Event::where('event_status', 'completed')
+            ->orderBy('date', 'desc')
+            ->get();
 
-        $totalSales = 0;
-        $totalEfectivo = 0;
-        $totalQR = 0;
-        $totalTarjeta = 0;
-        foreach ($allClosedEvents as $event) {
-            $sales = Sale::where('event_id', $event->id)->get();
-            $totalSales += $sales->sum('amount');
-            $totalEfectivo += $sales->where('payment_method', 'Efectivo')->sum('amount');
-            $totalQR += $sales->where('payment_method', 'QR')->sum('amount');
-            $totalTarjeta += $sales->where('payment_method', 'Tarjeta')->sum('amount');
-        }
+        $closedEvents = Event::where('event_status', 'completed')
+            ->withSum('sales as event_total', 'amount')
+            ->withCount('sales as sales_count')
+            ->orderBy('date', 'desc')
+            ->paginate(4);
+
+        $eventIds = $allClosedEvents->pluck('id');
+
+        $totals = Sale::whereIn('event_id_new', $eventIds)
+            ->selectRaw('COALESCE(SUM(amount), 0) as total')
+            ->selectRaw('COALESCE(SUM(CASE WHEN payment_method = ? THEN amount END), 0) as efectivo', ['Efectivo'])
+            ->selectRaw('COALESCE(SUM(CASE WHEN payment_method = ? THEN amount END), 0) as qr', ['QR'])
+            ->selectRaw('COALESCE(SUM(CASE WHEN payment_method = ? THEN amount END), 0) as tarjeta', ['Tarjeta'])
+            ->first();
+
+        $totalSales = $totals->total;
+        $totalEfectivo = $totals->efectivo;
+        $totalQR = $totals->qr;
+        $totalTarjeta = $totals->tarjeta;
 
         $lastEvent = $allClosedEvents->sortByDesc('updated_at')->first();
         $lastEventSales = collect();
@@ -40,7 +49,7 @@ class ReportController extends Controller
         $productDetails = [];
 
         if ($lastEvent) {
-            $lastEventSales = Sale::where('event_id', $lastEvent->id)->with('items')->get();
+            $lastEventSales = Sale::where('event_id_new', $lastEvent->id)->with('items')->get();
             $lastEventSalesCount = $lastEventSales->count();
             $lastEventBiggestSale = $lastEventSales->max('amount') ?? 0;
             $biggestSale = $lastEventSales->firstWhere('amount', $lastEventBiggestSale);
@@ -81,7 +90,7 @@ class ReportController extends Controller
             usort($productPercentages, fn ($a, $b) => $b['count'] <=> $a['count']);
         }
 
-        $directSales = Sale::where('event_id', 'like', 'Venta Directa%')->with('items')->latest()->get();
+        $directSales = Sale::where('is_direct_sale', true)->with('items')->latest()->get();
         $directSalesTotal = $directSales->sum('amount');
         $directSalesEfectivo = $directSales->where('payment_method', 'Efectivo')->sum('amount');
         $directSalesQR = $directSales->where('payment_method', 'QR')->sum('amount');
@@ -107,8 +116,8 @@ class ReportController extends Controller
 
     public function show(Event $event)
     {
-        $totalAmount = Sale::where('event_id', $event->id)->sum('amount');
-        $sales = Sale::where('event_id', $event->id)->orderBy('id', 'desc')->paginate(7);
+        $totalAmount = Sale::where('event_id_new', $event->id)->sum('amount');
+        $sales = Sale::where('event_id_new', $event->id)->with('items')->orderBy('id', 'desc')->paginate(7);
 
         return view('reports.show', compact('event', 'sales', 'totalAmount'));
     }
@@ -120,14 +129,9 @@ class ReportController extends Controller
         return redirect()->route('reports.index')->with('success', 'Evento eliminado.');
     }
 
-    public function getEventTotal(string $eventId): float
-    {
-        return Sale::where('event_id', $eventId)->sum('amount');
-    }
-
     public function downloadPdf(Event $event)
     {
-        $sales = Sale::where('event_id', $event->id)->with('items')->orderBy('id', 'desc')->get();
+        $sales = Sale::where('event_id_new', $event->id)->with('items')->orderBy('id', 'desc')->get();
         $totalAmount = $sales->sum('amount');
 
         $html = view('pdf.event-detail', compact('event', 'sales', 'totalAmount'))->render();
@@ -139,7 +143,7 @@ class ReportController extends Controller
 
     public function directSales(string $date)
     {
-        $sales = Sale::where('event_id', 'like', 'Venta Directa%')
+        $sales = Sale::where('is_direct_sale', true)
             ->whereDate('created_at', $date)
             ->with('items')
             ->latest()
@@ -157,7 +161,7 @@ class ReportController extends Controller
 
     public function directSalesPdf(string $date)
     {
-        $sales = Sale::where('event_id', 'like', 'Venta Directa%')
+        $sales = Sale::where('is_direct_sale', true)
             ->whereDate('created_at', $date)
             ->with('items')
             ->latest()

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Staff;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 
@@ -23,14 +24,30 @@ class StaffAuthController extends Controller
             'password' => 'required|string',
         ]);
 
+        $key = 'login_attempts_'.$request->ip();
+
+        if (Cache::get($key, 0) >= 5) {
+            Log::warning('Cuenta bloqueada temporalmente por IP', [
+                'ip' => $request->ip(),
+                'username' => $request->username,
+            ]);
+
+            return back()->withErrors([
+                'username' => 'Demasiados intentos. Intente nuevamente en 15 minutos.',
+            ]);
+        }
+
         $staff = Staff::where('username', $request->username)->first();
 
         if ($staff && Hash::check($request->password, $staff->password)) {
+            Cache::forget($key);
             Auth::guard('staff')->login($staff);
             $request->session()->regenerate();
 
             return redirect()->intended('/dashboard');
         }
+
+        Cache::put($key, Cache::get($key, 0) + 1, now()->addMinutes(15));
 
         Log::warning('Intento de inicio de sesión fallido', [
             'username' => $request->username,

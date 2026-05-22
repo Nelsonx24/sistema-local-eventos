@@ -27,9 +27,11 @@ class Log extends Model
         ];
     }
 
-    public static function record(string $type, string $action, string $description, ?array $oldValues = null, ?array $newValues = null): self
+    public static function record(string $type, string $action, string $description, ?array $oldValues = null, ?array $newValues = null): void
     {
-        return static::create([
+        $description = str_replace(["\r", "\n", "\0"], ' ', $description);
+
+        $data = [
             'type' => $type,
             'action' => $action,
             'description' => $description,
@@ -37,6 +39,8 @@ class Log extends Model
             'user_name' => Auth::user()?->name,
             'old_values' => $oldValues,
             'new_values' => $newValues,
-        ]);
+        ];
+
+        defer(fn () => static::create($data));
     }
 }

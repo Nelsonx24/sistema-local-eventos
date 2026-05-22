@@ -17,7 +17,9 @@ return new class extends Migration
             $table->string('last_name')->nullable()->after('first_name');
         });
 
-        DB::statement('UPDATE staff SET first_name = SUBSTRING_INDEX(name, " ", 1), last_name = SUBSTRING(SUBSTRING_INDEX(name, " ", 2), LOCATE(" ", name) + 1) WHERE name IS NOT NULL');
+        if (DB::getDriverName() === 'mysql') {
+            DB::statement('UPDATE staff SET first_name = SUBSTRING_INDEX(name, " ", 1), last_name = SUBSTRING(SUBSTRING_INDEX(name, " ", 2), LOCATE(" ", name) + 1) WHERE name IS NOT NULL');
+        }
     }
 
     /**

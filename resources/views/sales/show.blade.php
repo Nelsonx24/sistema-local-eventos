@@ -37,7 +37,7 @@
                 Historial de Ventas del Evento
             </h4>
             <span class="text-[0.75rem] font-bold text-brand-accent bg-brand-gold/10 px-3 py-1 rounded-full border border-brand-gold/20">
-                Total Acumulado: {{ number_format($sales->sum('amount')) }} Bs
+                Total Acumulado: {{ number_format($eventTotal) }} Bs
             </span>
         </div>
 

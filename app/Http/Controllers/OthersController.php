@@ -42,7 +42,7 @@ class OthersController extends Controller
 
     public function assets()
     {
-        $assets = Asset::orderBy('category')->orderBy('name')->get();
+        $assets = Asset::orderBy('category')->orderBy('name')->paginate(20);
 
         return view('others.assets', compact('assets'));
     }

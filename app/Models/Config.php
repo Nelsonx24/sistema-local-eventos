@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Cache;
 
 class Config extends Model
 {
@@ -15,9 +16,11 @@ class Config extends Model
 
     public static function get(string $key, $default = null)
     {
-        $config = static::where('key', $key)->first();
+        return Cache::remember("config_{$key}", 3600, function () use ($key, $default) {
+            $config = static::where('key', $key)->first();
 
-        return $config ? $config->value : $default;
+            return $config ? $config->value : $default;
+        });
     }
 
     public static function set(string $key, $value): void
@@ -26,6 +29,7 @@ class Config extends Model
             ['key' => $key],
             ['value' => $value]
         );
+        Cache::forget("config_{$key}");
     }
 
     public static function getQR(): string

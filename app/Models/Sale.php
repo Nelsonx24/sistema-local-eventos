@@ -16,6 +16,8 @@ class Sale extends Model
 
     protected $fillable = [
         'event_id',
+        'event_id_new',
+        'is_direct_sale',
         'client_name',
         'amount',
         'cash_received',
@@ -35,12 +37,14 @@ class Sale extends Model
             'cash_received' => 'decimal:2',
             'change_given' => 'decimal:2',
             'is_printed' => 'boolean',
+            'is_direct_sale' => 'boolean',
+            'event_id_new' => 'integer',
         ];
     }
 
     public function event(): BelongsTo
     {
-        return $this->belongsTo(Event::class, 'event_id', 'id');
+        return $this->belongsTo(Event::class, 'event_id_new', 'id');
     }
 
     public function items(): HasMany

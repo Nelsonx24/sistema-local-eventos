@@ -78,6 +78,11 @@
             </tbody>
         </table>
     </div>
+    @if($assets->hasPages())
+    <div class="mt-4">
+        {{ $assets->links() }}
+    </div>
+    @endif
 </div>
 
 <!-- Asset Modal -->

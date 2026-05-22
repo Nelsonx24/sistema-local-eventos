@@ -116,6 +116,11 @@
             </tbody>
         </table>
     </div>
+    @if($inventory->hasPages())
+    <div class="mt-4 px-6 pb-4">
+        {{ $inventory->links() }}
+    </div>
+    @endif
 </div>
 
 <!-- Register Modal -->

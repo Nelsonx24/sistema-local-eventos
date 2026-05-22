@@ -32,19 +32,20 @@ class SaleController extends Controller
 
     public function show(Event $event)
     {
-        $sales = Sale::where('event_id', $event->id)->orderBy('id', 'desc')->paginate(5);
+        $sales = Sale::where('event_id_new', $event->id)->with('items')->orderBy('id', 'desc')->paginate(5);
+        $eventTotal = Sale::where('event_id_new', $event->id)->sum('amount');
         $inventory = Inventory::all();
         $clientNames = Sale::distinct()->pluck('client_name')->merge(
             Event::distinct()->pluck('client_name')
         )->unique()->sort()->values();
 
-        return view('sales.show', compact('event', 'sales', 'inventory', 'clientNames'));
+        return view('sales.show', compact('event', 'sales', 'eventTotal', 'inventory', 'clientNames'));
     }
 
     public function directSale()
     {
         $inventory = Inventory::all();
-        $sales = Sale::where('event_id', 'Venta Directa')->orderBy('id', 'desc')->get();
+        $sales = Sale::where('is_direct_sale', true)->with('items')->orderBy('id', 'desc')->get();
         $clientNames = Sale::distinct()->pluck('client_name')->merge(
             Event::distinct()->pluck('client_name')
         )->unique()->sort()->values();
@@ -67,10 +68,17 @@ class SaleController extends Controller
             return back()->withErrors(['items' => 'Debe agregar al menos un producto.']);
         }
 
+        $names = collect($items)->pluck('name')->unique()->values()->all();
+        $inventoryLookup = Inventory::whereIn('name', $names)->get()->keyBy('name');
+
         $totalAmount = 0;
 
         foreach ($items as $item) {
-            $inventoryItem = Inventory::where('name', $item['name'])->first();
+            if (! isset($item['name'], $item['quantity'], $item['type'])) {
+                return back()->withErrors(['items' => 'Formato de item inválido.']);
+            }
+
+            $inventoryItem = $inventoryLookup[$item['name']] ?? null;
             if (! $inventoryItem) {
                 return back()->withErrors(['items' => "Producto {$item['name']} no encontrado en inventario."]);
             }
@@ -86,14 +94,12 @@ class SaleController extends Controller
                 }
             }
 
-            if ($inventoryItem) {
-                $price = $item['type'] === 'Caja'
-                    ? $inventoryItem->price_per_box
-                    : $inventoryItem->price_per_unit;
-                $totalAmount += $price * $item['quantity'];
+            $price = $item['type'] === 'Caja'
+                ? $inventoryItem->price_per_box
+                : $inventoryItem->price_per_unit;
+            $totalAmount += $price * $item['quantity'];
 
-                $inventoryItem->subtractStock($item['quantity'], $item['type']);
-            }
+            $inventoryItem->subtractStock($item['quantity'], $item['type']);
         }
 
         $cashReceived = $validated['payment_method'] === 'Efectivo'
@@ -102,8 +108,12 @@ class SaleController extends Controller
 
         $changeGiven = $cashReceived > $totalAmount ? $cashReceived - $totalAmount : 0;
 
-        $sale = Sale::create([
+        $isDirect = blank($validated['event_id']) || str_starts_with($validated['event_id'], 'Venta Directa');
+
+        $saleData = [
             'event_id' => $validated['event_id'] ?? 'Venta Directa',
+            'event_id_new' => $isDirect ? null : ((int) $validated['event_id']),
+            'is_direct_sale' => $isDirect,
             'client_name' => $validated['client_name'],
             'amount' => $totalAmount,
             'cash_received' => $cashReceived,
@@ -113,10 +123,12 @@ class SaleController extends Controller
             'status' => 'Paid',
             'seller_name' => Auth::user()?->name ?? 'Sistema',
             'is_printed' => false,
-        ]);
+        ];
+
+        $sale = Sale::create($saleData);
 
         foreach ($items as $item) {
-            $inventoryItem = Inventory::where('name', $item['name'])->first();
+            $inventoryItem = $inventoryLookup[$item['name']];
             $price = $item['type'] === 'Caja'
                 ? $inventoryItem->price_per_box
                 : $inventoryItem->price_per_unit;

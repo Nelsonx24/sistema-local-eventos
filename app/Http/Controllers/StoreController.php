@@ -36,7 +36,10 @@ class StoreController extends Controller
 
     public function productShow(StoreProduct $storeProduct)
     {
-        return response()->json($storeProduct);
+        return response()->json($storeProduct->only([
+            'id', 'name', 'detail', 'cost', 'sale_price', 'stock',
+            'expiration_date', 'barcode', 'category', 'product_type_id', 'image_url',
+        ]));
     }
 
     public function productCreate()
@@ -50,12 +53,12 @@ class StoreController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'detail' => 'nullable|string',
+            'detail' => 'nullable|string|max:1000',
             'cost' => 'required|numeric|min:0',
             'sale_price' => 'required|numeric|min:0',
             'expiration_date' => 'nullable|date',
             'stock' => 'required|integer|min:0',
-            'barcode' => 'nullable|string|max:100',
+            'barcode' => 'nullable|string|max:100|unique:store_products,barcode',
             'category' => 'required|string|max:255',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
         ]);
@@ -83,18 +86,18 @@ class StoreController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'detail' => 'nullable|string',
+            'detail' => 'nullable|string|max:1000',
             'cost' => 'required|numeric|min:0',
             'sale_price' => 'required|numeric|min:0',
             'expiration_date' => 'nullable|date',
             'stock' => 'required|integer|min:0',
-            'barcode' => 'nullable|string|max:100',
+            'barcode' => 'nullable|string|max:100|unique:store_products,barcode,'.$storeProduct->id,
             'category' => 'required|string|max:255',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
         ]);
 
         if ($request->hasFile('image')) {
-            if ($storeProduct->image) {
+            if ($storeProduct->image && str_starts_with($storeProduct->image, 'store/products/')) {
                 Storage::disk('public')->delete($storeProduct->image);
             }
             $validated['image'] = $request->file('image')->store('store/products', 'public');
@@ -173,7 +176,10 @@ class StoreController extends Controller
 
     public function giftShow(StoreGift $storeGift)
     {
-        return response()->json($storeGift);
+        return response()->json($storeGift->only([
+            'id', 'name', 'detail', 'cost', 'sale_price', 'stock',
+            'barcode', 'category', 'gift_type_id', 'image_url',
+        ]));
     }
 
     public function giftCreate()
@@ -187,11 +193,11 @@ class StoreController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'detail' => 'nullable|string',
+            'detail' => 'nullable|string|max:1000',
             'cost' => 'required|numeric|min:0',
             'sale_price' => 'required|numeric|min:0',
             'stock' => 'required|integer|min:0',
-            'barcode' => 'nullable|string|max:100',
+            'barcode' => 'nullable|string|max:100|unique:store_gifts,barcode',
             'category' => 'required|string|max:255',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
         ]);
@@ -219,17 +225,17 @@ class StoreController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'detail' => 'nullable|string',
+            'detail' => 'nullable|string|max:1000',
             'cost' => 'required|numeric|min:0',
             'sale_price' => 'required|numeric|min:0',
             'stock' => 'required|integer|min:0',
-            'barcode' => 'nullable|string|max:100',
+            'barcode' => 'nullable|string|max:100|unique:store_gifts,barcode,'.$storeGift->id,
             'category' => 'required|string|max:255',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
         ]);
 
         if ($request->hasFile('image')) {
-            if ($storeGift->image) {
+            if ($storeGift->image && str_starts_with($storeGift->image, 'store/gifts/')) {
                 Storage::disk('public')->delete($storeGift->image);
             }
             $validated['image'] = $request->file('image')->store('store/gifts', 'public');

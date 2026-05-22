@@ -51,7 +51,7 @@ class Event extends Model
 
     public function sales(): HasMany
     {
-        return $this->hasMany(Sale::class, 'event_id', 'id');
+        return $this->hasMany(Sale::class, 'event_id_new', 'id');
     }
 
     public function isConfirmed(): bool

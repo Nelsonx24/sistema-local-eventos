@@ -27,6 +27,7 @@ Route::middleware(['auth:staff'])->group(function () {
     Route::get('/events', [EventController::class, 'index'])->name('events.index');
     Route::get('/events/calendar-pdf', [EventController::class, 'downloadCalendar'])->name('events.calendar-pdf');
     Route::get('/events/report-pdf', [EventController::class, 'downloadReport'])->name('events.report-pdf');
+    Route::match(['post', 'delete'], '/events/types', [EventController::class, 'manageTypes'])->name('events.types')->middleware('role:Administrador');
     Route::get('/events/{event}', [EventController::class, 'show'])->name('events.show');
     Route::get('/events/{event}/edit-data', [EventController::class, 'editData'])->name('events.edit-data');
     Route::post('/events', [EventController::class, 'store'])->name('events.store');
@@ -36,7 +37,6 @@ Route::middleware(['auth:staff'])->group(function () {
     Route::post('/events/{event}/upload-contract', [EventController::class, 'uploadContract'])->name('events.upload-contract');
     Route::get('/events/{event}/download-contract', [EventController::class, 'downloadContract'])->name('events.download-contract');
     Route::post('/events/{event}/close', [EventController::class, 'close'])->name('events.close');
-    Route::post('/events/types', [EventController::class, 'manageTypes'])->name('events.types');
 
     Route::get('/inventory', [InventoryController::class, 'index'])->name('inventory.index');
     Route::get('/inventory/pdf', [InventoryController::class, 'downloadPdf'])->name('inventory.pdf');

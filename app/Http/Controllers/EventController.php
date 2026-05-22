@@ -26,19 +26,23 @@ class EventController extends Controller
         $events = $query->paginate(10)->withQueryString();
         $eventTypes = Config::getEventTypes();
 
-        $eventsJson = Event::orderBy('date', 'asc')->get()->map(function ($e) {
-            return [
-                'id' => $e->id,
-                'title' => $e->client_name,
-                'date' => Carbon::parse($e->date)->format('Y-m-d'),
-                'type' => $e->event_type,
-                'guests' => $e->guests,
-                'balance' => $e->balance_pending,
-                'signed' => $e->signed_contract_url,
-            ];
-        });
+        $calendarEvents = Event::whereYear('date', now()->year)
+            ->whereMonth('date', '>=', now()->subMonths(3)->month)
+            ->orderBy('date', 'asc')
+            ->get(['id', 'client_name', 'date', 'event_type', 'balance_pending', 'signed_contract_url'])
+            ->map(function ($e) {
+                return [
+                    'id' => $e->id,
+                    'title' => $e->client_name,
+                    'date' => $e->date->format('Y-m-d'),
+                    'type' => $e->event_type,
+                    'guests' => null,
+                    'balance' => $e->balance_pending,
+                    'signed' => $e->signed_contract_url,
+                ];
+            });
 
-        return view('events.index', compact('events', 'eventTypes', 'eventsJson', 'filter'));
+        return view('events.index', compact('events', 'eventTypes', 'filter') + ['eventsJson' => $calendarEvents]);
     }
 
     public function store(Request $request)
@@ -199,7 +203,18 @@ class EventController extends Controller
     public function uploadContract(Request $request, Event $event)
     {
         $request->validate([
-            'contract_file' => ['file', 'mimetypes:application/pdf,image/jpeg,image/png', 'max:2048'],
+            'contract_file' => [
+                'file',
+                'mimes:pdf,jpeg,png',
+                'max:2048',
+                function ($attribute, $value, $fail) {
+                    $mime = $value->getMimeType();
+                    $allowed = ['application/pdf', 'image/jpeg', 'image/png'];
+                    if (! in_array($mime, $allowed)) {
+                        $fail('El archivo debe ser PDF, JPEG o PNG válido.');
+                    }
+                },
+            ],
         ]);
 
         if ($request->hasFile('contract_file')) {

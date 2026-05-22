@@ -17,12 +17,16 @@ class StaffController extends Controller
 
     public function show(Staff $staff)
     {
-        return response()->json($staff);
+        return response()->json($staff->only([
+            'id', 'name', 'first_name', 'last_name', 'role', 'username', 'email', 'status', 'avatar',
+        ]));
     }
 
     public function edit(Staff $staff)
     {
-        return response()->json($staff);
+        return response()->json($staff->only([
+            'id', 'name', 'first_name', 'last_name', 'role', 'username', 'email', 'status', 'avatar',
+        ]));
     }
 
     public function store(Request $request)
@@ -82,7 +86,7 @@ class StaffController extends Controller
             'password' => 'required|string|min:6',
         ]);
 
-        $staff->password = bcrypt($request->password);
+        $staff->password = $request->password;
         $staff->save();
 
         Log::record('Personal', 'Actualizar', "Contraseña cambiada para {$staff->name}");

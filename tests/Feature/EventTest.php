@@ -34,7 +34,7 @@ it('can create an event', function () {
         ->assertRedirect(route('events.index'));
 
     $this->assertDatabaseHas('events', [
-        'client_name' => 'JUAN PÉREZ',
+        'client_name' => 'Juan Pérez',
         'event_type' => 'Boda',
     ]);
 });

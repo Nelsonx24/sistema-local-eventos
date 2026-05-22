@@ -1,34 +1,423 @@
-Thought: Now I understand the issues with the failing tests. Let me look at the test files to see what they're sending and compare with what the controllers expect.
-Key issues:
-1. Event factory: client_id is not set - the events table requires client_id as a non-nullable string
-2. Event test: event store requires client_id and other fields
-3. Event types test: expects new_type field
-4. Inventory restock: expects inventory_id field (not product_id)
-5. Staff test: missing email and role fields
-Let me read the actual test files to understand exactly what needs to change.
-Let me read the test files to identify what needs fixing.
-→ Read tests\Feature\EventTest.php 
-→ Read tests\Feature\InventoryTest.php 
-→ Read tests\Feature\StaffTest.php 
-Thought: Let me analyze each failure:
-1. DashboardTest - max() error because no completed events with specific products. Need to create events with sales containing the right product names.
-2. EventTest - create event: Missing client_id in the $eventData. The controller requires client_id as required string.
-3. EventTest - manage event types: It sends types but the controller's POST path expects new_type. Let me re-read the manageTypes method.
-4. InventoryTest - restock: It sends product_id but the controller expects inventory_id.
-5. StaffTest - requires username: Missing email and role which are required.
-6. SettingsTest: Need to check what's happening.
-7. LogTest: Need to check.
-Let me read the controllers more carefully, and also the other test files.
-→ Read app\Http\Controllers\EventController.php [limit=60]
-→ Read app\Http\Controllers\EventController.php [offset=220, limit=40]
-→ Read tests\Feature\DashboardTest.php 
-→ Read tests\Feature\SettingsTest.php 
-→ Read tests\Feature\LogTest.php 
+ RESUMEN EJECUTIVO
+Fortalezas:
+42 tests pasando, buena cobertura en Eventos, Staff, Ventas, Inventario
+Laravel 12 con Eloquent ORM (SQL Injection protegido)
+CSRF automático en todos los formularios
+Blade escapa XSS por defecto
+Sesiones encriptadas en base de datos
+Debilidades principales:
+6 consultas N+1 que degradan rendimiento significativamente
+Módulo Store sin tests (0% cobertura)
+Login "Recordarme" y "Olvidé contraseña" sin funcionalidad
+Falta de policies para autorización granular
+Double query de inventario en processSale
+Event::manageTypes sin middleware de rol
+Carga actual de datos:
+Staff: 3 usuarios
+Eventos: ~5-10 (con borrados suaves)
+Ventas: 41 registros
+Store: 0 productos, 0 regalos
+Logs: 48 registros
+# Todos
+[✓] Ejecutar tests existentes y revisar cobertura
+[✓] Probar login/logout, sesiones, fuerza bruta
+[✓] Probar CRUDs, validaciones, subida archivos
+[✓] Probar roles, permisos, escalada de privilegios
+[✓] Probar SQL Injection, XSS, CSRF, manipulación
+[✓] Analizar consultas N+1 y rendimiento BD
+[✓] Probar UX/UI, mensajes de error, navegación
+[✓] Revisar technical debt, logs, configuración
+[✓] Emitir informe completo con hallazgos
+Auditoría completa. 42 tests OK, 13 hallazgos (2 críticos, 4 altos, 5 medios, 4 bajos + 6 bugs UX). ¿Quieres que implemente las correcciones de los hallazgos? Recomiendo empezar por los 2 N+1 críticos en ReportController y los tests del módulo Store.
+▣  Build · DeepSeek V4 Flash Free · 3m 2s
+si
+Thought: The user wants me to implement the fixes. Let me prioritize and work through them:
+1. 🔴 CRIT-01: N+1 ReportController::index
+2. 🔴 CRIT-02: N+1 in view reports/index.blade.php (depends on CRIT-01 fix)
+3. 🟠 HIGH-01: N+1 SaleController::show and directSale (add ->with('items'))
+4. 🟠 HIGH-02: N+1 ReportController::show (add ->with('items'))
+5. 🟠 HIGH-03: Staff::show exposes sensitive data
+6. 🟡 MED-01: Double inventory query in processSale
+7. 🟡 MED-05: events.types route without role middleware
+8. 🟢 LOW-03: Barcode unique
+Let me also fix the MED-04 about Event manageTypes middleware.
+Let me start with the ReportController which needs the most work.
+# Todos
+[•] 🔴 CRIT-01+02: N+1 en ReportController::index y vista
+[ ] 🟠 HIGH-01: N+1 SaleController (items eager loading)
+[ ] 🟠 HIGH-02: N+1 ReportController::show (items eager)
+[ ] 🟠 HIGH-03: Staff::show no exponer password hash
+[ ] 🟡 MED-01: Doble query inventory en processSale
+[ ] 🟡 MED-05: events.types route sin middleware role
+[ ] 🟢 LOW-03: Barcode unique en productos/regalos
+[ ] Ejecutar tests y Pint
+Thought: Let me start implementing. First, let me read the current files that need changes and prepare the fixes.
+For CRIT-01+02, I need to:
+1. Fix ReportController::index() - eager load sales or use withSum/withCount
+2. Fix reports/index.blade.php - use the eager loaded data
+Let me read the current state of both files since I modified them heavily earlier.
+→ Read app\Http\Controllers\ReportController.php 
+→ Read resources\views\reports\index.blade.php 
+Thought: Now I have the full picture. Let me implement all the fixes:
+1. ReportController::index() - Replace the N+1 loop with a single query using withSum and withCount from the Event model. I need to add relationships on the Event model.
+Wait, Sale doesn't have event_id as a FK relationship since it's stored as a string (varchar). The Event model has $this->hasMany(Sale::class, 'event_id', 'id') - but event_id on the Sale table is varchar, and id on Event is bigint. These won't match because they're different types. But actually, looking at the test code in SaleTest.php:
+$sale = Sale::factory()->create(['event_id' => $event->id]);
+So event_id stores the integer ID as a string. The relationship in Event.php is:
+public function sales(): HasMany
+{
+    return $this->hasMany(Sale::class, 'event_id', 'id');
+}
+This should work because Laravel's Eloquent handles the casting.
+But for withSum and withCount, I need to make sure the relationship is defined. The Event model already has sales() relationship defined.
+For the N+1 in the view, I need to:
+- Eager-load sales relationship with withSum('sales as event_total', 'amount') and withCount('sales as sales_count')
+- Replace the inline queries in the view with $event->event_total and $event->sales_count
+For the totals across all events, instead of looping through $allClosedEvents, I can use aggregate queries:
+$totalSales = Sale::whereIn('event_id', $allClosedEvents->pluck('id'))->sum('amount');
+$totalEfectivo = Sale::whereIn('event_id', $allClosedEvents->pluck('id'))->where('payment_method', 'Efectivo')->sum('amount');
+But this is still 3 queries. A better approach:
+$totals = Sale::whereIn('event_id', $allClosedEvents->pluck('id'))
+    ->selectRaw('COALESCE(SUM(amount), 0) as total')
+    ->selectRaw("COALESCE(SUM(CASE WHEN payment_method = 'Efectivo' THEN amount END), 0) as efectivo")
+    ->selectRaw("COALESCE(SUM(CASE WHEN payment_method = 'QR' THEN amount END), 0) as qr")
+    ->selectRaw("COALESCE(SUM(CASE WHEN payment_method = 'Tarjeta' THEN amount END), 0) as tarjeta")
+    ->first();
+Or even simpler, use the event totals that are already eager-loaded, since we're loading all events with their sales:
+$allClosedEvents = Event::with('sales')->where('event_status', 'completed')->orderBy('date', 'desc')->get();
+$totalSales = $allClosedEvents->sum(fn ($e) => $e->sales->sum('amount'));
+But this loads all sale data into memory, which could be a lot. Let me use a more efficient approach.
+Actually, the cleanest approach for the totals (which are aggregations) is to query them separately with aggregate functions:
+$totalSales = Sale::whereIn('event_id', $allClosedEvents->pluck('id'))
+    ->selectRaw('COALESCE(SUM(amount), 0) as total,
+        COALESCE(SUM(CASE WHEN payment_method = "Efectivo" THEN amount END), 0) as efectivo,
+        COALESCE(SUM(CASE WHEN payment_method = "QR" THEN amount END), 0) as qr,
+        COALESCE(SUM(CASE WHEN payment_method = "Tarjeta" THEN amount END), 0) as tarjeta')
+    ->first();
+For the paginated events, I'll add withCount and withSum.
+For the view, I need to remove the inline queries at lines 167 and 185.
+Let me also think about the Event model - I need to make sure the relationship works. The Event model has sales() relationship. For withSum to work, I need the relationship to be recognized. Let me check if withSum works with a hasMany relationship where the FK is a string.
+Actually, withSum and withCount work with any relationship that Eloquent supports. The hasMany(Sale::class, 'event_id', 'id') should work fine.
+Let me also note that for the getEventTotal private method, it's at line 123-126 and is unused (it's not a route handler, it's a private helper). I should check if anything calls it.
+OK let me now implement everything. Let me write all the changes.
+Let me implement multiple fixes in parallel:
+# Wrote app\Http\Controllers\ReportController.php
+<?php
+namespace App\Http\Controllers;
+use App\Models\Event;
+use App\Models\Sale;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
+class ReportController extends Controller
+{
+    public function index()
+    {
+        $allClosedEvents = Event::where('event_status', 'completed')
+            ->orderBy('date', 'desc')
+            ->get();
+        $closedEvents = Event::where('event_status', 'completed')
+            ->withSum('sales as event_total', 'amount')
+            ->withCount('sales as sales_count')
+            ->orderBy('date', 'desc')
+            ->paginate(4);
+        $eventIds = $allClosedEvents->pluck('id');
+        $totals = Sale::whereIn('event_id', $eventIds)
+            ->selectRaw('COALESCE(SUM(amount), 0) as total')
+            ->selectRaw('COALESCE(SUM(CASE WHEN payment_method = ? THEN amount END), 0) as efectivo', ['Efectivo'])
+            ->selectRaw('COALESCE(SUM(CASE WHEN payment_method = ? THEN amount END), 0) as qr', ['QR'])
+            ->selectRaw('COALESCE(SUM(CASE WHEN payment_method = ? THEN amount END), 0) as tarjeta', ['Tarjeta'])
+            ->first();
+        $totalSales = $totals->total;
+        $totalEfectivo = $totals->efectivo;
+        $totalQR = $totals->qr;
+        $totalTarjeta = $totals->tarjeta;
+        $lastEvent = $allClosedEvents->sortByDesc('updated_at')->first();
+        $lastEventSales = collect();
+        $lastEventSalesCount = 0;
+        $lastEventBiggestSale = 0;
+        $lastEventBiggestSaleClient = '';
+        $lastEventEfectivo = 0;
+        $lastEventQR = 0;
+        $lastEventTarjeta = 0;
+        $totalBoxes = 0;
+        $totalUnits = 0;
+        $productPercentages = [];
+        $productDetails = [];
+        if ($lastEvent) {
+            $lastEventSales = Sale::where('event_id', $lastEvent->id)->with('items')->get();
+            $lastEventSalesCount = $lastEventSales->count();
+            $lastEventBiggestSale = $lastEventSales->max('amount') ?? 0;
+            $biggestSale = $lastEventSales->firstWhere('amount', $lastEventBiggestSale);
+            $lastEventBiggestSaleClient = $biggestSale?->client_name ?? '—';
+            $lastEventEfectivo = $lastEventSales->where('payment_method', 'Efectivo')->sum('amount');
+            $lastEventQR = $lastEventSales->where('payment_method', 'QR')->sum('amount');
+            $lastEventTarjeta = $lastEventSales->where('payment_method', 'Tarjeta')->sum('amount');
+            $productCounts = [];
+            $totalItems = 0;
+            foreach ($lastEventSales as $sale) {
+                foreach ($sale->items as $item) {
+                    $key = $item->name;
+                    $productCounts[$key] = ($productCounts[$key] ?? 0) + $item->quantity;
+                    $totalItems += $item->quantity;
+                    if ($item->type === 'Caja') {
+                        $totalBoxes += $item->quantity;
+                    } else {
+                        $totalUnits += $item->quantity;
+                    }
+                    if (! isset($productDetails[$key])) {
+                        $productDetails[$key] = ['name' => $key, 'boxes' => 0, 'units' => 0];
+                    }
+                    if ($item->type === 'Caja') {
+                        $productDetails[$key]['boxes'] += $item->quantity;
+                    } else {
+                        $productDetails[$key]['units'] += $item->quantity;
+                    }
+                }
+            }
+            foreach ($productCounts as $name => $count) {
+                $productPercentages[] = [
+                    'name' => $name,
+                    'count' => $count,
+                    'percentage' => $totalItems > 0 ? round(($count / $totalItems) * 100, 1) : 0,
+                ];
+            }
+            usort($productPercentages, fn ($a, $b) => $b['count'] <=> $a['count']);
+        }
+        $directSales = Sale::where('event_id', 'like', 'Venta Directa%')->with('items')->latest()->get();
+        $directSalesTotal = $directSales->sum('amount');
+        $directSalesEfectivo = $directSales->where('payment_method', 'Efectivo')->sum('amount');
+        $directSalesQR = $directSales->where('payment_method', 'QR')->sum('amount');
+        $directSalesTarjeta = $directSales->where('payment_method', 'Tarjeta')->sum('amount');
+        $directSalesByDate = $directSales->groupBy(fn ($s) => $s->created_at->format('Y-m-d'))
+            ->sortKeysDesc()
+            ->map(fn ($group) => [
+                'sales' => $group,
+                'count' => $group->count(),
+                'total' => $group->sum('amount'),
+            ]);
+        return view('reports.index', compact(
+            'closedEvents', 'totalSales', 'totalEfectivo', 'totalQR', 'totalTarjeta',
+            'lastEvent', 'lastEventSales', 'lastEventSalesCount', 'lastEventBiggestSale', 'lastEventBiggestSaleClient',
+            'lastEventEfectivo', 'lastEventQR', 'lastEventTarjeta', 'productPercentages',
+            'totalBoxes', 'totalUnits', 'productDetails',
+            'directSales', 'directSalesTotal', 'directSalesEfectivo', 'directSalesQR', 'directSalesTarjeta',
+            'directSalesByDate'
+        ));
+    }
+    public function show(Event $event)
+    {
+        $totalAmount = Sale::where('event_id', $event->id)->sum('amount');
+        $sales = Sale::where('event_id', $event->id)->with('items')->orderBy('id', 'desc')->paginate(7);
+        return view('reports.show', compact('event', 'sales', 'totalAmount'));
+    }
+    public function destroy(Event $event)
+    {
+        $event->delete();
+        return redirect()->route('reports.index')->with('success', 'Evento eliminado.');
+    }
+    public function downloadPdf(Event $event)
+    {
+        $sales = Sale::where('event_id', $event->id)->with('items')->orderBy('id', 'desc')->get();
+        $totalAmount = $sales->sum('amount');
+        $html = view('pdf.event-detail', compact('event', 'sales', 'totalAmount'))->render();
+        $pdf = Pdf::loadHTML($html);
+        return $pdf->download("Reporte_{$event->client_name}.pdf");
+    }
+    public function directSales(string $date)
+    {
+        $sales = Sale::where('event_id', 'like', 'Venta Directa%')
+            ->whereDate('created_at', $date)
+            ->with('items')
+            ->latest()
+            ->get();
+        $total = $sales->sum('amount');
+        $efectivo = $sales->where('payment_method', 'Efectivo')->sum('amount');
+        $qr = $sales->where('payment_method', 'QR')->sum('amount');
+        $tarjeta = $sales->where('payment_method', 'Tarjeta')->sum('amount');
+        $displayDate = Carbon::parse($date)->format('d/m/Y');
+        return view('reports.direct', compact('sales', 'total', 'efectivo', 'qr', 'tarjeta', 'displayDate', 'date'));
+    }
+    public function directSalesPdf(string $date)
+    {
+        $sales = Sale::where('event_id', 'like', 'Venta Directa%')
+            ->whereDate('created_at', $date)
+            ->with('items')
+            ->latest()
+            ->get();
+        $total = $sales->sum('amount');
+        $efectivo = $sales->where('payment_method', 'Efectivo')->sum('amount');
+        $qr = $sales->where('payment_method', 'QR')->sum('amount');
+        $tarjeta = $sales->where('payment_method', 'Tarjeta')->sum('amount');
+        $displayDate = Carbon::parse($date)->format('d/m/Y');
+        $html = view('pdf.direct-sales', compact('sales', 'total', 'efectivo', 'qr', 'tarjeta', 'displayDate', 'date'))->render();
+        $pdf = Pdf::loadHTML($html);
+        return $pdf->download("Ventas_Directas_{$date}.pdf");
+    }
+}
+← Edit resources\views\reports\index.blade.php
+    </tr>
+</thead>
+<tbody class="divide-y divide-slate-100">
+    @forelse($closedEvents as $event)
+    @php $eventTotal = App\Models\Sale::where('event_id', $event->id)->sum('amount'); @endphp
+    <tr class="hover:bg-slate-50 transition-colors group">
+        <td class="px-[7px] py-1.5">
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-8 bg-slate-100 text-slate-500 rounded-lg flex items-center justify-center font-bold text-xs uppercase group-hover:bg-brand-accent group-hover:text-white transition-colors">
+            <span class="text-[0.7rem] font-medium text-slate-600">{{ $event->date->format('d/m/Y') }}</span>
+        </td>
+        <td class="px-[7px] py-1.5 text-center">
+            <span class="px-2 py-0.5 bg-brand-gold/10 text-brand-gold text-[0.6rem] font-bold rounded-full border border-brand-gold/20">
+                {{ App\Models\Sale::where('event_id', $event->id)->count() }} facturas
+                {{ $event->sales_count }} facturas
+            </span>
+        </td>
+        <td class="px-[7px] py-1.5 text-right">
+            <p class="text-xs font-extrabold text-slate-900">{{ number_format($eventTotal) }} Bs</p>
+            <p class="text-xs font-extrabold text-slate-900">{{ number_format($event->event_total) }} Bs</p>
+        </td>
+        <td class="px-[7px] py-1.5 text-center">
+            <a href="{{ route('reports.show', $event->id) }}" class="w-7 h-7 rounded-full flex items-center justify-center text-slate-300 group-hover:text-brand-accent group-hover:bg-brand-gold/10 transition-all">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
+Thought: Now I need to fix the remaining items. Let me do the rest in parallel:
+1. SaleController - add ->with('items') on show and directSale
+2. SaleController - fix double inventory query in processSale
+3. StaffController - fix show() to not expose password
+4. Route events.types add middleware
+5. Store validation add barcode unique
+Let me also remove the unused getEventTotal method and DB import from ReportController since I didn't end up using it.
+Wait, I imported DB in ReportController but didn't use it directly since I used selectRaw with binding. Let me check - actually, Sale::whereIn(...)->selectRaw(...)->first() doesn't need DB, it uses the query builder. So I should remove the DB import.
+← Edit app\Http\Controllers\ReportController.php
+use App\Models\Event;
+use App\Models\Sale;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
+class ReportController extends Controller
+{
+    public function index()
+← Edit app\Http\Controllers\SaleController.php
+}
+public function show(Event $event)
+{
+    $sales = Sale::where('event_id', $event->id)->orderBy('id', 'desc')->paginate(5);
+    $sales = Sale::where('event_id', $event->id)->with('items')->orderBy('id', 'desc')->paginate(5);
+    $inventory = Inventory::all();
+    $clientNames = Sale::distinct()->pluck('client_name')->merge(
+        Event::distinct()->pluck('client_name')
+    )->unique()->sort()->values();
+Thought: Now fix the directSale method and processSale double query.
+← Edit app\Http\Controllers\SaleController.php
+public function directSale()
+{
+    $inventory = Inventory::all();
+    $sales = Sale::where('event_id', 'Venta Directa')->orderBy('id', 'desc')->get();
+    $sales = Sale::where('event_id', 'Venta Directa')->with('items')->orderBy('id', 'desc')->get();
+    $clientNames = Sale::distinct()->pluck('client_name')->merge(
+        Event::distinct()->pluck('client_name')
+    )->unique()->sort()->values();
+Thought: Now fix the processSale double inventory query. Let me read the current file to see the exact code.
+→ Read app\Http\Controllers\SaleController.php [limit=50, offset=55]
+Thought: I can see the issue. The first loop (lines 72-97) already calls $inventoryItem->subtractStock($item['quantity'], $item['type']) which deducts stock AND saves. Then the second loop (lines 118-131) queries Inventory again to create SaleItem records. 
+The real problems are:
+1. The second loop queries Inventory again (N additional queries)
+2. The first loop queries Inventory one at a time (N queries)
+Let me refactor to eagerly load all inventory in a single query, store them in a keyed collection, then reuse that in both loops.
+← Edit app\Http\Controllers\SaleController.php
+if (! $items || ! is_array($items) || count($items) < 1) {
+    return back()->withErrors(['items' => 'Debe agregar al menos un producto.']);
+}
+$names = collect($items)->pluck('name')->unique()->values()->all();
+$inventoryLookup = Inventory::whereIn('name', $names)->get()->keyBy('name');
+$totalAmount = 0;
+foreach ($items as $item) {
+    $inventoryItem = Inventory::where('name', $item['name'])->first();
+    if (! isset($item['name'], $item['quantity'], $item['type'])) {
+        return back()->withErrors(['items' => 'Formato de item inválido.']);
+    }
+    $inventoryItem = $inventoryLookup[$item['name']] ?? null;
+    if (! $inventoryItem) {
+        return back()->withErrors(['items' => "Producto {$item['name']} no encontrado en inventario."]);
+    }
+            return back()->withInput()->with('stock_error', "Stock insuficiente de {$item['name']}: hay {$totalUnits} unidad(es), solicitó {$item['quantity']}.")->with('cart_data', $request->items);
+        }
+    }
+    if ($inventoryItem) {
+        $price = $item['type'] === 'Caja'
+            ? $inventoryItem->price_per_box
+            : $inventoryItem->price_per_unit;
+        $totalAmount += $price * $item['quantity'];
+    $price = $item['type'] === 'Caja'
+        ? $inventoryItem->price_per_box
+        : $inventoryItem->price_per_unit;
+    $totalAmount += $price * $item['quantity'];
+        $inventoryItem->subtractStock($item['quantity'], $item['type']);
+    }
+    $inventoryItem->subtractStock($item['quantity'], $item['type']);
+}
+$cashReceived = $validated['payment_method'] === 'Efectivo'
+    ? ($validated['cash_received'] ?? $totalAmount)
+    'is_printed' => false,
+]);
+foreach ($items as $item) {
+    $inventoryItem = Inventory::where('name', $item['name'])->first();
+    $inventoryItem = $inventoryLookup[$item['name']];
+    $price = $item['type'] === 'Caja'
+        ? $inventoryItem->price_per_box
+        : $inventoryItem->price_per_unit;
+Thought: Now fix the StaffController show method, the route for events.types, and the barcode unique validation.
+← Edit app\Http\Controllers\StaffController.php
+}
+public function show(Staff $staff)
+{
+    return response()->json($staff);
+    return response()->json($staff->only([
+        'id', 'name', 'first_name', 'last_name', 'role', 'username', 'email', 'status', 'avatar',
+    ]));
+}
+public function edit(Staff $staff)
+{
+    return response()->json($staff);
+    return response()->json($staff->only([
+        'id', 'name', 'first_name', 'last_name', 'role', 'username', 'email', 'status', 'avatar',
+    ]));
+}
+public function store(Request $request)
+{
+Thought: Now add the middleware to events.types route, and fix the barcode validation in StoreController.
+← Edit routes\web.php
+Route::post('/events/{event}/pay-balance', [EventController::class, 'payBalance'])->name('events.pay-balance');
+Route::post('/events/{event}/upload-contract', [EventController::class, 'uploadContract'])->name('events.upload-contract');
+Route::get('/events/{event}/download-contract', [EventController::class, 'downloadContract'])->name('events.download-contract');
+Route::post('/events/{event}/close', [EventController::class, 'close'])->name('events.close');
+Route::post('/events/types', [EventController::class, 'manageTypes'])->name('events.types');
+Route::post('/events/types', [EventController::class, 'manageTypes'])->name('events.types')->middleware('role:Administrador');
+Route::get('/inventory', [InventoryController::class, 'index'])->name('inventory.index');
+Route::get('/inventory/pdf', [InventoryController::class, 'downloadPdf'])->name('inventory.pdf');
+Route::post('/inventory', [InventoryController::class, 'store'])->name('inventory.store');
+Thought: Now fix the barcode unique validation in StoreController.
+← Edit app\Http\Controllers\StoreController.php
+    'cost' => 'required|numeric|min:0',
+    'sale_price' => 'required|numeric|min:0',
+    'expiration_date' => 'nullable|date',
+    'stock' => 'required|integer|min:0',
+    'barcode' => 'nullable|string|max:100',
+    'barcode' => 'nullable|string|max:100|unique:store_products,barcode,'.$storeProduct->id,
+    'category' => 'required|string|max:255',
+    'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+]);
+Thought: Now let me also add barcode unique to the gift store and gift update.
+Now add barcode unique for gifts too:
+← Edit app\Http\Controllers\StoreController.php
+    'detail' => 'nullable|string|max:1000',
+    'cost' => 'required|numeric|min:0',
+    'sale_price' => 'required|numeric|min:0',
+    'stock' => 'required|integer|min:0',
+    'barcode' => 'nullable|string|max:100',
+    'barcode' => 'nullable|string|max:100|unique:store_gifts,barcode,'.$storeGift->id,
+    'category' => 'required|string|max:255',
+    'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+]);
+Thought: Now I also need to add barcode unique to productStore (create). Let me check the current state of productStore.
+→ Read app\Http\Controllers\StoreController.php [limit=20, offset=49]
 
-
-registrar bien los tipos de eventos
-en el login y el sistema poner el logo del local
-agregar boton para ocultar el sidebar
-terminar reportes
-activos del Salon 
-invetario de la tienda (cesar)

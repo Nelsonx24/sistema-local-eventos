@@ -164,7 +164,6 @@
                 </thead>
                 <tbody class="divide-y divide-slate-100">
                     @forelse($closedEvents as $event)
-                    @php $eventTotal = App\Models\Sale::where('event_id', $event->id)->sum('amount'); @endphp
                     <tr class="hover:bg-slate-50 transition-colors group">
                         <td class="px-[7px] py-1.5">
                             <div class="flex items-center gap-2">
@@ -182,11 +181,11 @@
                         </td>
                         <td class="px-[7px] py-1.5 text-center">
                             <span class="px-2 py-0.5 bg-brand-gold/10 text-brand-gold text-[0.6rem] font-bold rounded-full border border-brand-gold/20">
-                                {{ App\Models\Sale::where('event_id', $event->id)->count() }} facturas
+                                {{ $event->sales_count }} facturas
                             </span>
                         </td>
                         <td class="px-[7px] py-1.5 text-right">
-                            <p class="text-xs font-extrabold text-slate-900">{{ number_format($eventTotal) }} Bs</p>
+                            <p class="text-xs font-extrabold text-slate-900">{{ number_format($event->event_total) }} Bs</p>
                         </td>
                         <td class="px-[7px] py-1.5 text-center">
                             <a href="{{ route('reports.show', $event->id) }}" class="w-7 h-7 rounded-full flex items-center justify-center text-slate-300 group-hover:text-brand-accent group-hover:bg-brand-gold/10 transition-all">
@@ -225,9 +224,9 @@
                             <th class="px-[7px] py-1.5 text-[0.6rem] font-bold text-slate-400 uppercase tracking-widest text-center"></th>
                         </tr>
                     </thead>
+                    <tbody class="divide-y divide-slate-100">
                     @forelse($directSalesByDate as $dateKey => $group)
                     @php $displayDate = \Carbon\Carbon::parse($dateKey)->format('d/m/Y'); @endphp
-                    <tbody class="divide-y divide-slate-100">
                         <tr class="hover:bg-slate-50 transition-colors cursor-pointer" onclick="window.location='{{ route('reports.direct', $dateKey) }}'">
                             <td class="px-[7px] py-1.5">
                                 <div class="flex items-center gap-2">
@@ -251,14 +250,12 @@
                                 </a>
                             </td>
                         </tr>
-                    </tbody>
                     @empty
-                    <tbody>
                         <tr>
                             <td colspan="4" class="px-4 py-8 text-center text-slate-400 italic">No hay ventas directas registradas.</td>
                         </tr>
-                    </tbody>
                     @endforelse
+                    </tbody>
                 </table>
             </div>
         </div>

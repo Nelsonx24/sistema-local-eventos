@@ -5,6 +5,22 @@
 
 @section('content')
 <div class="flex flex-col gap-6">
+    @if(session('success'))
+    <div class="bg-emerald-50 border border-emerald-200 text-emerald-700 px-4 py-3 rounded-lg text-sm font-medium flex items-center gap-2">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        {{ session('success') }}
+    </div>
+    @endif
+    @if($errors->any())
+    <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm font-medium flex items-center gap-2">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+        <ul class="list-disc list-inside">
+            @foreach($errors->all() as $error)
+            <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+    @endif
     <div class="flex justify-between items-center px-6 py-4 bg-white rounded-lg border border-border-subtle shadow-sm">
         <h3 class="font-semibold text-text-main">Personal y Trabajadores</h3>
         <button onclick="openStaffModal()" class="bg-brand-primary text-white px-4 py-2 rounded-[6px] text-[0.8rem] font-bold hover:bg-slate-800 transition-all flex items-center gap-2">
@@ -129,11 +145,11 @@
             <div id="staff-credentials-fields" class="grid grid-cols-2 gap-4">
                 <div class="flex flex-col gap-1.5">
                     <label class="text-[0.65rem] font-bold text-text-muted uppercase">Usuario</label>
-                    <input id="staff-username" type="text" name="username" class="px-4 py-2 bg-slate-50 border border-border-subtle rounded-lg text-sm">
+                    <input required id="staff-username" type="text" name="username" class="px-4 py-2 bg-slate-50 border border-border-subtle rounded-lg text-sm">
                 </div>
                 <div class="flex flex-col gap-1.5">
                     <label class="text-[0.65rem] font-bold text-text-muted uppercase">Password</label>
-                    <input id="staff-password" type="text" name="password" class="px-4 py-2 bg-slate-50 border border-border-subtle rounded-lg text-sm">
+                    <input required id="staff-password" type="password" name="password" class="px-4 py-2 bg-slate-50 border border-border-subtle rounded-lg text-sm" minlength="8">
                 </div>
             </div>
             <button id="staff-submit-btn" type="submit" class="mt-4 bg-brand-primary text-white py-2.5 rounded-lg font-bold">Registrar Trabajador</button>
@@ -205,6 +221,11 @@
 <script>
 function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
 function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+
+var hasErrors = {!! json_encode($errors->any()) !!};
+if (hasErrors) {
+    openStaffModal();
+}
 
 function openStaffModal() {
     document.getElementById('staff-form').action = '{{ route("staff.store") }}';
